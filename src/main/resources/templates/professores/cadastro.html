@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layout}">
+<head>
+<meta charset="UTF-8" />
+</head>
+
+<body>
+	<section class="layout-content" layout:fragment="corpo">
+		<nav class="navbar navbar-expand-md bg-light">
+			<div class="navbar-collapse" id="navbarsExampleDefault">
+				<ul class="navbar-nav float-right">
+					<li class="nav-item active"><i class="oi oi-caret-right"></i>
+						<span>Cadastrar Professores</span></li>
+				</ul>
+				<a class="btn btn-primary ms-1" href="/professores/listar"
+					role="button"> <span class="oi oi-spreadsheet" title="Listar"
+					aria-hidden="true"></span> <span>Listar Professores</span>
+				</a>
+			</div>
+		</nav>
+
+		<div class="container" id="cadastro">
+			<div th:if="${sucesso} != null">
+				<div class="alert alert-success" role="alert">
+					<i class="oi oi-check"></i> <span> <strong
+						th:text="${sucesso}"></strong>
+					</span>
+					<button type="button" class="btn-close" data-bs-dismiss="alert"
+						aria-label="Close"></button>
+				</div>
+			</div>
+			<form
+				th:action="${professor.matricula == null} ? @{/professores/salvar} : @{/professores/editar}"
+				th:object="${professor}" method="POST">
+
+				<div th:if="${#fields.hasAnyErrors()}">
+					<div class="alert alert-danger alert-dismissible fade show"
+						role="alert">
+						<div th:each="error : ${#fields.detailedErrors()}">
+							<i class="oi oi-warning"></i> <span th:text="${error.message}"></span>
+						</div>
+						<button type="button" class="btn-close" data-bs-dismiss="alert"
+							aria-label="Close"></button>
+					</div>
+				</div>
+				<div class="grid">
+					<div class="row">
+						<div class="col-md-6">
+							<label for="nome">Nome do Professor</label> <input type="text"
+								class="form-control" id="nome" placeholder="Nome do professor"
+								autofocus="autofocus" th:field="*{nome}"
+								th:classappend="${#fields.hasErrors('nome')} ? 'is-invalid'" />
+						</div>
+						<div class="col-md-6">
+							<label for="nome">Área de ensino</label> <input type="text"
+								class="form-control" id="area" placeholder="Área de ensino"
+								autofocus="autofocus" th:field="*{area}"
+								th:classappend="${#fields.hasErrors('area')} ? 'is-invalid'" />
+						</div>
+					</div>
+				</div>
+				<input type="hidden" id="matricula" th:field="*{matricula}" />
+				<button type="submit" class="btn btn-primary btn-sm mt-1 ">Salvar</button>
+			</form>
+		</div>
+	</section>
+</body>
+</html>

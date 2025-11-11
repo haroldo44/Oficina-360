@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layout}">
+<head>
+<meta charset="UTF-8" />
+</head>
+
+<body>
+	<section class="layout-content" layout:fragment="corpo">
+		<nav class="navbar navbar-expand-md bg-light">
+			<div class="navbar-collapse" id="navbarsExampleDefault">
+				<ul class="navbar-nav float-right">
+					<li class="nav-item active"><i class="oi oi-caret-right"></i>
+						<span>Cadastrar Aluno</span></li>
+				</ul>
+				<a class="btn btn-primary ms-1" href="/alunos/listar" role="button">
+					<span class="oi oi-spreadsheet" title="Listar" aria-hidden="true"></span>
+					<span>Listar Alunos</span>
+				</a>
+			</div>
+		</nav>
+
+		<div class="container" id="cadastro">
+			<div th:if="${sucesso} != null">
+				<div class="alert alert-success" role="alert">
+					<i class="oi oi-check"></i> <span> <strong
+						th:text="${sucesso}"></strong>
+					</span>
+					<button type="button" class="btn-close" data-bs-dismiss="alert"
+						aria-label="Close"></button>
+				</div>
+			</div>
+			<form
+				th:action="${aluno.matricula == null} ? @{/alunos/salvar} : @{/alunos/editar}"
+				th:object="${aluno}" method="POST">
+
+				<div th:if="${#fields.hasAnyErrors()}">
+					<div class="alert alert-danger alert-dismissible fade show"
+						role="alert">
+						<div th:each="error : ${#fields.detailedErrors()}">
+							<i class="oi oi-warning"></i> <span th:text="${error.message}"></span>
+						</div>
+						<button type="button" class="btn-close" data-bs-dismiss="alert"
+							aria-label="Close"></button>
+					</div>
+				</div>
+				<div class="form-row">
+					<div class="form-group col-md-6">
+						<label for="nome">Nome do Aluno</label> <input type="text"
+							class="form-control" id="nome" placeholder="Nome do aluno"
+							autofocus="autofocus" th:field="*{nome}"
+							th:classappend="${#fields.hasErrors('nome')} ? 'is-invalid'" />
+					</div>
+				</div>
+				<div class="grid">
+					<div class="row">
+						<div class="col-md-4">
+							<label for="nome">Rua</label> <input type="text"
+								class="form-control" id="rua" placeholder="Rua"
+								autofocus="autofocus" th:field="*{endereco.rua}"
+								th:classappend="${#fields.hasErrors('endereco.rua')} ? 'is-invalid'" />
+						</div>
+						<div class="col-md-3">
+							<label for="nome">Bairro</label> <input type="text"
+								class="form-control" id="bairro" placeholder="Bairro"
+								autofocus="autofocus" th:field="*{endereco.bairro}"
+								th:classappend="${#fields.hasErrors('endereco.bairro')} ? 'is-invalid'" />
+						</div>
+						<div class="col-md-1">
+							<label for="nome">Numero</label> <input type="text"
+								class="form-control" id="numero" placeholder="Numero"
+								autofocus="autofocus" th:field="*{endereco.numero}"
+								th:classappend="${#fields.hasErrors('endereco.numero')} ? 'is-invalid'" />
+						</div>
+						<div class="col-md-2">
+							<label for="nome">Cidade</label> <input type="text"
+								class="form-control" id="cidade" placeholder="Cidade"
+								autofocus="autofocus" th:field="*{endereco.cidade}"
+								th:classappend="${#fields.hasErrors('endereco.cidade')} ? 'is-invalid'" />
+						</div>
+					</div>
+					<div class="form-row">
+						<div class="col-md-4">
+							<label for="cursos">Curso</label> <select id="cursos"
+								class="form-select" th:field="*{curso}">
+								<option value="">Selecione o curso..</option>
+								<option th:each="c : ${cursos}" th:value="${c.codigo}"
+									th:text="${c.nome}"></option>
+							</select>
+							<div class="invalid-feedback"></div>
+						</div>
+					</div>
+				</div>
+				<input type="hidden" id="matricula" th:field="*{matricula}" />
+				<button type="submit" class="btn btn-primary btn-sm mt-1 ">Salvar</button>
+			</form>
+		</div>
+	</section>
+</body>
+</html>

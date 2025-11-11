@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html layout:decorate="~{layout}">
+<head>
+<meta charset="UTF-8" />
+</head>
+
+<body>
+	<section class="layout-content" layout:fragment="corpo">
+		<nav class="navbar navbar-expand-md bg-light">
+			<div class="navbar-collapse" id="navbarsExampleDefault">
+				<ul class="navbar-nav float-right">
+					<li class="nav-item active"><i class="oi oi-caret-right"></i>
+						<span>Matricular Aluno</span></li>
+				</ul>
+				<a class="btn btn-primary ms-1" href="/matriculas/listar" role="button">
+					<span class="oi oi-spreadsheet" title="Listar" aria-hidden="true"></span>
+					<span>Histórico escolar</span>
+				</a>
+			</div>
+		</nav>
+
+		<div class="container" id="cadastro">
+			<div th:if="${sucesso} != null">
+				<div class="alert alert-success" role="alert">
+					<i class="oi oi-check"></i> <span> <strong
+						th:text="${sucesso}"></strong>
+					</span>
+					<button type="button" class="btn-close" data-bs-dismiss="alert"
+						aria-label="Close"></button>
+				</div>
+			</div>
+			<form
+				th:action="@{/matriculas/salvar}"
+				th:object="${alunoMatricula}" method="POST">
+
+
+				<div class="grid">
+					<div class="row">
+						<div class="col-md-6">
+							<label for="nome">Matricula do aluno</label> <input type="text"
+								class="form-control" id="nome" placeholder="Matricula do aluno"
+								autofocus="autofocus" th:field="*{matricula}"
+								 />
+						</div>
+						<div class="col-md-6">
+							<label for="nome">Período</label> <input type="text"
+								class="form-control" id="periodo"
+								placeholder="Período" autofocus="autofocus"
+								th:field="*{periodo}"
+								/>
+						</div>
+					</div>
+					<div class="row">
+						<label class="col-md-6">Disciplinas:</label>
+						<div class="col=sm-8 text-left">
+							<th:block th:each="d : ${listaDisciplinas}">
+							<div>
+								<input type="checkbox" th:field="*{disciplinas}" th:text="${d.nome}" th:value="${d.codigo}" />
+							</div>
+						</div>
+				</div>
+				<button type="submit" class="btn btn-primary btn-sm mt-1 ">Salvar</button>
+			</form>
+		</div>
+	</section>
+</body>
+</html>
