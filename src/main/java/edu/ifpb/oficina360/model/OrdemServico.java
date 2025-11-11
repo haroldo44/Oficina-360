@@ -13,7 +13,7 @@ import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "ORDEMSERVICO") // nome da tabela conforme seu banco
+@Table(name = "ORDEMSERVICO") 
 public class OrdemServico {
 
     @Id

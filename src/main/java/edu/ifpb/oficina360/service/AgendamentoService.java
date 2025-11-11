@@ -30,21 +30,17 @@ public class AgendamentoService {
     private EmpresaRepository empresaRepository;
 
 
-    // LISTAR TODOS
     public List<Agendamento> listar() {
         return agendamentoRepository.findAll();
     }
 
-    // BUSCAR POR ID
     public Agendamento buscarPorId(Long id) {
         return agendamentoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Agendamento não encontrado!"));
     }
 
-    // SALVAR (com cliente, mecânico e empresa)
     public Agendamento salvar(Agendamento agendamento, Long idCliente, Long idMecanico, Long idEmpresa) {
 
-        // 1. Busca as entidades relacionadas ou lança exceção (RuntimeException)
         Cliente cliente = clienteRepository.findById(idCliente)
                 .orElseThrow(() -> new RuntimeException("Cliente não encontrado!"));
 
@@ -54,22 +50,17 @@ public class AgendamentoService {
         Empresa empresa = empresaRepository.findById(idEmpresa)
                 .orElseThrow(() -> new RuntimeException("Empresa não encontrada!"));
 
-        // 2. Associa as entidades ao agendamento
         agendamento.setCliente(cliente);
         agendamento.setMecanico(mecanico);
         agendamento.setEmpresa(empresa);
 
-        // 3. Salva e retorna o agendamento
         return agendamentoRepository.save(agendamento);
     }
 
-    // ATUALIZAR
     public Agendamento atualizar(Long id, Agendamento dados) {
         Agendamento agendamento = buscarPorId(id);
 
-        // Atualiza apenas os campos mutáveis
         agendamento.setDataAgendada(dados.getDataAgendada());
-        // CORREÇÃO: Uso do método 'getHoraAgendada()' do modelo Agendamento.java
         agendamento.setHoraAgendada(dados.getHoraAgendada());
         agendamento.setStatus(dados.getStatus());
         agendamento.setDescricaoProblemaCliente(dados.getDescricaoProblemaCliente());
@@ -77,7 +68,6 @@ public class AgendamentoService {
         return agendamentoRepository.save(agendamento);
     }
 
-    // DELETAR
     public void deletar(Long id) {
         agendamentoRepository.deleteById(id);
     }

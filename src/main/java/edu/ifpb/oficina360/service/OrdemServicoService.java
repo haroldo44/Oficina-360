@@ -17,7 +17,6 @@ public class OrdemServicoService {
     @Autowired
     private OrdemServicoRepository ordemServicoRepository;
 
-    // INJEÇÃO NECESSÁRIA para buscar as entidades Cliente e Mecanico
     @Autowired
     private ClienteRepository clienteRepository;
 
@@ -25,24 +24,19 @@ public class OrdemServicoService {
     private MecanicoRepository mecanicoRepository;
 
 
-    // 1. MÉTODO: listar()
     public List<OrdemServico> listar() {
         return ordemServicoRepository.findAll();
     }
 
-    // 2. MÉTODO: buscarPorId(Long id) - Retornando a entidade (não Optional)
     public OrdemServico buscarPorId(Long id) {
         return ordemServicoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Ordem de Serviço não encontrada! ID: " + id));
     }
     
-    // 3. MÉTODO: salvar(OrdemServico ordemServico, Long idCliente, Long idMecanico)
     public OrdemServico salvar(OrdemServico ordemServico, Long idCliente, Long idMecanico) {
-        // Busca e associa o Cliente
         Cliente cliente = clienteRepository.findById(idCliente)
                 .orElseThrow(() -> new RuntimeException("Cliente não encontrado! ID: " + idCliente));
 
-        // Busca e associa o Mecanico
         Mecanico mecanico = mecanicoRepository.findById(idMecanico)
                 .orElseThrow(() -> new RuntimeException("Mecânico não encontrado! ID: " + idMecanico));
 
@@ -52,11 +46,9 @@ public class OrdemServicoService {
         return ordemServicoRepository.save(ordemServico);
     }
     
-    // 4. MÉTODO: atualizar(Long id, OrdemServico novosDados)
     public OrdemServico atualizar(Long id, OrdemServico novosDados) {
-        OrdemServico os = buscarPorId(id); // Reusa o método para buscar a OS
+        OrdemServico os = buscarPorId(id); 
 
-        // Atualiza os campos relevantes (mantendo Cliente e Mecânico originais)
         os.setDescricaoProblemaCliente(novosDados.getDescricaoProblemaCliente());
         os.setDiagnosticoMecanico(novosDados.getDiagnosticoMecanico());
         os.setSolucaoAplicada(novosDados.getSolucaoAplicada());
@@ -70,9 +62,7 @@ public class OrdemServicoService {
         return ordemServicoRepository.save(os);
     }
 
-    // Método deletar
     public void deletar(Long id) {
-        // Verifica se existe antes de deletar
         buscarPorId(id); 
         ordemServicoRepository.deleteById(id);
     }

@@ -22,7 +22,6 @@ public class AgendamentoController {
     @Autowired
     private AgendamentoService agendamentoService;
 
-    // Agora lista na raiz /agendamentos
     @GetMapping
     public List<Agendamento> listar() {
         return agendamentoService.listar();

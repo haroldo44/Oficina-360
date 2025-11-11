@@ -7,34 +7,32 @@ import jakarta.persistence.*;
 public class Mecanico {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "mecanico_seq")
-    @SequenceGenerator(name = "mecanico_seq", sequenceName = "SEQ_MECANICO", allocationSize = 1)
-    @Column(name = "ID_MECANICO")
-    private Long idMecanico;
+    @Column(name = "ID_USUARIO")
+    private Long idUsuario; // PK compartilhada
 
-    @Column(name = "NOME", nullable = false)
-    private String nome;
+    @OneToOne
+    @MapsId
+    @JoinColumn(name = "ID_USUARIO") 
+    private Usuario usuario;
 
     @ManyToOne
     @JoinColumn(name = "ID_EMPRESA", nullable = false)
     private Empresa empresa;
 
-    @OneToOne
-    @JoinColumn(name = "ID_USUARIO", nullable = false, unique = true)
-    private Usuario usuario;
+    @Column(name = "NOME", nullable = false)
+    private String nome;
 
     public Mecanico() {}
 
-    // Getters e Setters
-    public Long getIdMecanico() { return idMecanico; }
-    public void setIdMecanico(Long idMecanico) { this.idMecanico = idMecanico; }
+    public Long getIdUsuario() { return idUsuario; }
+    public void setIdUsuario(Long idUsuario) { this.idUsuario = idUsuario; }
 
-    public String getNome() { return nome; }
-    public void setNome(String nome) { this.nome = nome; }
+    public Usuario getUsuario() { return usuario; }
+    public void setUsuario(Usuario usuario) { this.usuario = usuario; }
 
     public Empresa getEmpresa() { return empresa; }
     public void setEmpresa(Empresa empresa) { this.empresa = empresa; }
 
-    public Usuario getUsuario() { return usuario; }
-    public void setUsuario(Usuario usuario) { this.usuario = usuario; }
+    public String getNome() { return nome; }
+    public void setNome(String nome) { this.nome = nome; }
 }

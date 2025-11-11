@@ -26,13 +26,11 @@ public class MecanicoController {
         return ResponseEntity.ok(novo);
     }
 
-    // ✅ Listar todos os mecânicos
     @GetMapping
     public ResponseEntity<List<Mecanico>> listar() {
         return ResponseEntity.ok(mecanicoService.listar());
     }
 
-    // ✅ Buscar mecânico por ID
     @GetMapping("/{id}")
     public ResponseEntity<Mecanico> buscarPorId(@PathVariable Long id) {
         return ResponseEntity.ok(mecanicoService.buscarPorId(id));

@@ -25,26 +25,22 @@ public class EmpresaController {
         return ResponseEntity.ok(novaEmpresa);
     }
 
-    // ✅ Listar todas as empresas
     @GetMapping
     public ResponseEntity<List<Empresa>> listar() {
         return ResponseEntity.ok(empresaService.listar());
     }
 
-    // ✅ Buscar empresa por ID
     @GetMapping("/{id}")
     public ResponseEntity<Empresa> buscarPorId(@PathVariable Long id) {
         return ResponseEntity.ok(empresaService.buscarPorId(id));
     }
 
-    // ✅ Atualizar empresa
     @PutMapping("/{id}")
     public ResponseEntity<Empresa> atualizar(@PathVariable Long id, @RequestBody Empresa empresa) {
         Empresa empresaAtualizada = empresaService.atualizar(id, empresa);
         return ResponseEntity.ok(empresaAtualizada);
     }
 
-    // ✅ Deletar empresa
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
         empresaService.deletar(id);

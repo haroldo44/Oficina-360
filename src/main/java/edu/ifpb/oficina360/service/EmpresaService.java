@@ -21,33 +21,25 @@ public class EmpresaService {
 
     @Transactional
     public Empresa salvar(Long idUsuario, Empresa empresa) {
-        // Busca o usuário existente
         Usuario usuario = usuarioRepository.findById(idUsuario)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado: " + idUsuario));
 
-        // ⚠️ Zera o ID antes de salvar, para não tentar reusar PK existente
         empresa.setIdUsuario(null);
-
-        // Vincula o usuário à empresa
         empresa.setUsuario(usuario);
 
-        // Salva — o ID será herdado via @MapsId do usuário
         return empresaRepository.save(empresa);
     }
 
 
-    // ✅ LISTAR TODAS
     public List<Empresa> listar() {
         return empresaRepository.findAll();
     }
 
-    // ✅ BUSCAR POR ID
     public Empresa buscarPorId(Long id) {
         return empresaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Empresa não encontrada! ID: " + id));
     }
 
-    // ✅ ATUALIZAR
     public Empresa atualizar(Long id, Empresa novosDados) {
         Empresa empresaExistente = buscarPorId(id);
 
@@ -65,7 +57,6 @@ public class EmpresaService {
         return empresaRepository.save(empresaExistente);
     }
 
-    // ✅ DELETAR
     public void deletar(Long id) {
         Empresa empresa = buscarPorId(id);
         empresaRepository.delete(empresa);

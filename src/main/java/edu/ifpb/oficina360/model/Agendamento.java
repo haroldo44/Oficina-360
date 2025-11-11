@@ -33,7 +33,7 @@ public class Agendamento {
     @JoinColumn(name = "ID_EMPRESA", referencedColumnName = "ID_USUARIO")
     private Empresa empresa;
 
-    @Column(name = "DESCRICAO_PROBLEMA_CLIENTE") // corresponde exatamente à coluna no Oracle
+    @Column(name = "DESCRICAO_PROBLEMA_CLIENTE") 
     private String descricaoProblemaCliente;
 
     @Column(name = "DATA_AGENDADA")

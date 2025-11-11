@@ -9,7 +9,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 
 @Entity
-@Table(name = "\"EMPRESA\"") // Aspas duplas obrigatórias
+@Table(name = "\"EMPRESA\"") 
 public class Empresa {
 
     // CHAVE PRIMÁRIA COMPARTILHADA (PK/FK)
@@ -18,8 +18,8 @@ public class Empresa {
     private Long idUsuario; 
 
     @OneToOne
-    @MapsId // CRÍTICO: Mapeia o campo idUsuario como sendo a PK/FK para Usuario
-    @JoinColumn(name = "ID_USUARIO") // Não precisa de referencedColumnName
+    @MapsId 
+    @JoinColumn(name = "ID_USUARIO") 
     private Usuario usuario;
     
     // CAMPOS DA OFICINA

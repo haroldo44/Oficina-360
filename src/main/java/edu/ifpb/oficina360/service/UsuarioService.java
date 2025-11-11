@@ -14,24 +14,20 @@ public class UsuarioService {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
-    // Listar todos
     public List<Usuario> listar() {
         return usuarioRepository.findAll();
     }
 
-    // Buscar por ID
     public Usuario buscarPorId(Long id) {
         return usuarioRepository.findById(id).orElseThrow(
             () -> new RuntimeException("Usuário não encontrado! ID: " + id)
         );
     }
 
-    // Criar
     public Usuario salvar(Usuario usuario) {
         return usuarioRepository.save(usuario);
     }
 
-    // Atualizar
     public Usuario atualizar(Long id, Usuario usuarioAtualizado) {
         Usuario usuario = buscarPorId(id);
 
@@ -43,7 +39,6 @@ public class UsuarioService {
         return usuarioRepository.save(usuario);
     }
 
-    // Deletar
     public void deletar(Long id) {
         usuarioRepository.deleteById(id);
     }

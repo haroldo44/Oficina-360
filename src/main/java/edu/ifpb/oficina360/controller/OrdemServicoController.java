@@ -24,27 +24,19 @@ public class OrdemServicoController {
     @Autowired
     private OrdemServicoService ordemServicoService;
 
-    // --- Endpoints Básicos ---
 
     @GetMapping
     public List<OrdemServico> listar() {
-        // Assume que OrdemServicoService possui um método listar()
         return ordemServicoService.listar(); 
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<OrdemServico> buscar(@PathVariable Long id) {
-        // Assume que OrdemServicoService possui um método buscarPorId(Long id) que retorna Optional ou a entidade
         OrdemServico os = ordemServicoService.buscarPorId(id);
         return os != null ? ResponseEntity.ok(os) : ResponseEntity.notFound().build();
     }
     
-    // --- Endpoints de Criação/Atualização (Adaptados) ---
 
-    /**
-     * POST: Cria uma nova Ordem de Serviço, ligando-a a um Cliente e um Mecânico.
-     * URI: /ordens-servico/{idCliente}/{idMecanico}
-     */
     @PostMapping("/{idCliente}/{idMecanico}")
     public ResponseEntity<OrdemServico> criarOrdemServico(
             @RequestBody OrdemServico ordemServico,
@@ -55,13 +47,8 @@ public class OrdemServicoController {
         return new ResponseEntity<>(novaOrdem, HttpStatus.CREATED);
     }
     
-    /**
-     * PUT: Atualiza uma Ordem de Serviço existente.
-     * URI: /ordens-servico/{id}
-     */
     @PutMapping("/{id}")
     public OrdemServico atualizar(@PathVariable Long id, @RequestBody OrdemServico ordemServico) {
-        // Assume que o método atualizar fará o trabalho de busca e merge no Service
         return ordemServicoService.atualizar(id, ordemServico); 
     }
 
