@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página da Oficina</title>
+    <link rel="stylesheet" th:href="@{/css/oficina-home.css}">
+</head>
+
+<body>
+
+<header th:replace="~{fragments/header :: cabecalho}"></header>
+
+<div class="container">
+
+    <div th:if="${sucesso}" class="alerta-sucesso">
+        <p th:text="${sucesso}"></p>
+    </div>
+    <div th:if="${erro}" class="alerta-erro">
+        <p th:text="${erro}"></p>
+    </div>
+
+    <h2 class="titulo-centro">Imagem da oficina</h2>
+
+    <div class="foto-oficina-box">
+
+        <img class="foto-oficina"
+             th:src="@{'/uploads/' + ${oficina.imagem}} + '?v=' + ${#dates.createNow().time}"
+             id="previewFotoOficina"
+             alt="Foto da Oficina">
+
+        <button class="btn-alterar-foto" onclick="document.getElementById('inputFotoOficina').click();">
+            Alterar foto
+        </button>
+
+        <form th:action="@{/oficinas/alterar-foto/{id}(id=${oficina.id})}"
+              method="post"
+              enctype="multipart/form-data">
+
+            <input type="file"
+                   id="inputFotoOficina"
+                   name="novaFoto"
+                   accept="image/*"
+                   style="display:none"
+                   onchange="previewAndSubmit(event, this.form)">
+        </form>
+
+    </div>
+
+    <p class="id-oficina">ID: <span th:text="${oficina.id}"></span></p>
+
+    <h2 class="titulo-centro">Informações</h2>
+
+    <div style="width:100%; display:flex; justify-content:flex-end; margin-bottom:15px;">
+        <button id="btnEditar" class="btn-editar">Editar</button>
+        <button id="btnSalvar" class="btn-salvar" style="display:none;">Salvar</button>
+        <button id="btnCancelar" class="btn-cancelar" style="display:none;">Cancelar</button>
+    </div>
+
+    <form id="formAtualizar"
+          th:action="@{/oficinas/atualizar/{id}(id=${oficina.id})}"
+          method="post">
+
+        <div class="info-container">
+
+            <div class="info-col-esq">
+                <label>Nome</label>
+                <input type="text" name="nomeDaOficina" th:value="${oficina.nomeDaOficina}" class="campo-editavel" readonly>
+
+                <label>CNPJ</label>
+                <input type="text" name="cnpj" th:value="${oficina.cnpj}" class="campo-editavel" readonly>
+
+                <label>Cidade</label>
+                <input type="text" name="cidade" th:value="${oficina.cidade}" class="campo-editavel" readonly>
+
+                <label>Bairro</label>
+                <input type="text" name="bairro" th:value="${oficina.bairro}" class="campo-editavel" readonly>
+
+                <label>Rua</label>
+                <input type="text" name="rua" th:value="${oficina.rua}" class="campo-editavel" readonly>
+            </div>
+
+            <div class="info-col-dir">
+
+                <label>Número de telefone</label>
+                <input type="text" name="telefoneDoProprietario" th:value="${oficina.telefoneDoProprietario}" class="campo-editavel" readonly>
+
+                <label>Descrição</label>
+                <textarea rows="11" name="descricao" class="campo-editavel" readonly
+                          th:text="${oficina.descricao}">
+                </textarea>
+
+            </div>
+
+        </div>
+
+        <button id="btnSalvarForm" type="submit" style="display:none;"></button>
+
+    </form>
+
+    <h2 class="titulo-centro">Mecânicos</h2>
+
+    <div class="botoes-mecanicos">
+        <button class="btn-remover" id="btnRemoverMecanico">Remover</button>
+        <button class="btn-adicionar" onclick="document.getElementById('modalAdicionarMecanico').style.display='block'">Adicionar</button>
+    </div>
+
+    <div class="mecanicos-grid">
+
+        <div class="card-mecanico" th:each="mecanico : ${mecanicos}" th:id="'mecanico-' + ${mecanico.id}">
+            
+            <img th:if="${mecanico.nomeArquivoFoto != null and mecanico.nomeArquivoFoto != ''}"
+                 th:src="@{'/uploads/' + ${mecanico.nomeArquivoFoto}} + '?v=' + ${#dates.createNow().time}"
+                 alt="Mecânico">
+                 
+            <img th:unless="${mecanico.nomeArquivoFoto != null and mecanico.nomeArquivoFoto != ''}"
+                 th:src="@{/images/perfil-default.png}"
+                 alt="Sem Foto">
+
+            <p class="nome-mecanico" th:text="${mecanico.nomeCompleto}"></p>
+            
+            <form th:action="@{/mecanicos/remover/{mecanicoId}/{oficinaId}(mecanicoId=${mecanico.id}, oficinaId=${oficina.id})}"
+                  method="post"
+                  class="form-remover-mecanico"
+                  style="display:none;">
+                <input type="hidden" name="idMecanico" th:value="${mecanico.id}">
+                <button type="submit" class="btn-submit-remover" title="Confirmar Remoção">X</button>
+            </form>
+        </div>
+        
+        <p th:if="${#lists.isEmpty(mecanicos)}" style="grid-column: span 4; text-align: center; color: #666;">
+            Nenhum mecânico cadastrado.
+        </p>
+    </div>
+
+</div> 
+
+<div id="modalAdicionarMecanico" class="modal-custom" style="display:none;">
+    <div class="modal-content-custom">
+        <span class="close-btn" onclick="document.getElementById('modalAdicionarMecanico').style.display='none'">&times;</span>
+        
+        <h3 class="titulo-centro">Adicionando mecânico</h3>
+
+        <form th:action="@{/mecanicos/adicionar/{oficinaId}(oficinaId=${oficina.id})}"
+              method="post"
+              enctype="multipart/form-data"
+              th:object="${mecanicoDto}">
+
+            <div style="text-align: center; margin-bottom: 20px;">
+                <label for="inputFotoMecanico" style="cursor: pointer;">
+                    <img th:src="@{/images/perfil-default.png}" style="width: 80px; height: 80px; border-radius: 50%; border: 1px solid #ddd;" alt="Adicionar foto">
+                    <p>Adicionar foto</p>
+                </label>
+                <input type="file" id="inputFotoMecanico" name="fotoPerfil" accept="image/*" style="display:none;">
+            </div>
+            
+            <label for="nomeCompleto">Nome completo</label>
+            <input type="text" id="nomeCompleto" name="nomeCompleto" th:field="*{nomeCompleto}" required>
+            <label for="email">Crie um email</label>
+            <input type="email" id="email" name="email" th:field="*{email}" required>
+
+            <label for="senha">Crie uma senha</label>
+            <input type="password" id="senha" name="senha" th:field="*{senha}" required>
+
+            <label for="telefone">N° Telefone</label>
+            <input type="tel" id="telefone" name="numeroTelefone" th:field="*{numeroTelefone}" required>
+            
+            <label>Horário de Trabalho</label>
+
+			<div style="display:flex; justify-content:space-between; gap: 15px;">
+    			<div>
+        			<label for="manhaInicio">Manhã Início</label>
+        			<input type="time" id="manhaInicio" name="turnoManhaInicioString" th:field="*{turnoManhaInicioString}" required>
+    			</div>
+    		<div>
+        		<label for="manhaFim">Manhã Fim</label>
+        		<input type="time" id="manhaFim" name="turnoManhaFimString" th:field="*{turnoManhaFimString}" required>
+    		</div>
+			</div>
+
+			<div style="display:flex; justify-content:space-between; gap: 15px; margin-top: 10px;">
+    			<div>
+        			<label for="tardeInicio">Tarde Início</label>
+        			<input type="time" id="tardeInicio" name="turnoTardeInicioString" th:field="*{turnoTardeInicioString}" required>
+    			</div>
+    			<div>
+        			<label for="tardeFim">Tarde Fim</label>
+        			<input type="time" id="tardeFim" name="turnoTardeFimString" th:field="*{turnoTardeFimString}" required>
+    			</div>
+			</div>
+
+            <div style="display:flex; justify-content:space-between; margin-top: 20px;">
+                <button type="button" onclick="document.getElementById('modalAdicionarMecanico').style.display='none'">Cancelar</button>
+                <button type="submit" class="btn-finalizar">Finalizar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<footer th:replace="~{fragments/footer :: rodape}"></footer>
+
+<script th:src="@{/js/oficina-home.js}"></script>
+
+</body>
+</html>

@@ -1,0 +1,127 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Inter", sans-serif;
+}
+
+body {
+    background: #fff;
+}
+
+.container {
+    max-width: 550px;
+    margin: 30px auto;
+    text-align: center;
+}
+
+.titulo {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+/* FOTO */
+.foto-box {
+    width: 200px;
+    height: 200px;
+    margin: 10px auto 12px auto;
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+.foto-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 3px solid #ccc;
+}
+
+/* BOTÃO ALTERAR FOTO */
+.btn-alterar-foto {
+    margin-top: 12px;
+    padding: 8px 18px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+/* FORM */
+.form {
+    margin-top: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+label {
+    text-align: left;
+    font-size: 14px;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    background: #f3f3f3;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+/* BOTÕES */
+.btn-excluir {
+    margin-top: 15px;
+    padding: 12px;
+    border: none;
+    background: #e63946;
+    color: #fff;
+    font-size: 14px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+/* MODAL */
+.modal {
+    display: none;
+    position: fixed;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.6);
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: white;
+    padding: 25px;
+    width: 350px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.modal-botoes {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.btn-confirmar {
+    background: #d63031;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.btn-cancelar {
+    background: #b2bec3;
+    color: black;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}

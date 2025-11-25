@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro - Etapa 3</title>
+    <link rel="stylesheet" th:href="@{/css/cadastro-etapa3.css}">
+</head>
+
+<body>
+
+<!-- HEADER -->
+<header th:replace="~{fragments/header :: cabecalho}"></header>
+
+<!-- CONTEÚDO CENTRAL -->
+<div class="conteudo">
+
+    <p class="titulo">Pegue o ID da oficina com o proprietário e digite abaixo</p>
+
+    <form th:action="@{/clientes/vincular-oficina}" th:object="${cliente}" method="post">
+
+        <input type="text" 
+               class="campo-input" 
+               th:field="*{oficina.id}" 
+               placeholder="Digite o ID da oficina">
+
+        <button class="btn-enviar">Adicionar oficina</button>
+    </form>
+</div>
+
+
+<!-- FOOTER -->
+<footer th:replace="~{fragments/footer :: rodape}"></footer>
+</body>
+</html>

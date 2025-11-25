@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oficina 360 - Login</title>
+	<link rel="stylesheet" th:href="@{/css/home.css}">
+</head>
+
+<body>
+
+    <div class="container">
+
+        <!-- LEFT SIDE -->
+        <div class="left-side">
+
+            <!-- SUA LOGO AQUI -->
+            <img src="/images/Logo-da-oficina.png" class="logo" alt="Oficina 360">
+
+            <p class="welcome-text">Bem vindo</p>
+
+            <input type="email" class="input-box" placeholder="Digite seu email">
+            <input type="password" class="input-box" placeholder="Digite sua senha">
+
+            <div class="forgot-password">
+                <a href="#" style="color:black; text-decoration:none;">Esqueceu sua senha?</a>
+            </div>
+
+            <button class="btn-login">LOGIN</button>
+
+            <div class="divider">
+                <span></span> OU <span></span>
+            </div>
+
+            <div class="create-account">
+                Não tem uma conta?
+                <a href="/tipoDeContas/escolhaTipo">Criar conta</a>
+            </div>
+
+        </div>
+
+        <!-- RIGHT SIDE (IMAGEM GRANDE) -->
+        <div class="right-side">
+            <img src="/images/Desenho da tela de login.png" alt="imagem-login">
+        </div>
+
+    </div>
+
+</body>
+</html>

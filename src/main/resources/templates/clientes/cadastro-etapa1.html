@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro-etapa1</title>
+	<link rel="stylesheet" th:href="@{/css/cadastro-etapa1-cliente.css}">
+</head>
+
+<body>
+
+<div class="container-flex">
+
+    <!-- LADO ESQUERDO -->
+    <div class="left">
+        <img class="logo" src="/images/logo-da-oficina.png" alt="Logo Oficina 360">
+
+        <div class="form-box">
+
+            <h3>Crie sua conta</h3>
+
+            <form th:action="@{/clientes/cadastro/etapa2}" th:object="${cliente}" method="post">
+
+                <input type="email" placeholder="Digite seu email" th:field="*{email}">
+                <div th:if="${#fields.hasErrors('email')}" class="text-danger">
+                    <p th:errors="*{email}"></p>
+                </div>
+
+                <input type="password" placeholder="Digite sua senha" th:field="*{senha}">
+                <div th:if="${#fields.hasErrors('senha')}" class="text-danger">
+                    <p th:errors="*{senha}"></p>
+                </div>
+
+                <input type="password" placeholder="Confirmar senha" th:field="*{confirmarSenha}">
+
+                <button class="btn-black" type="submit">CRIAR CONTA</button>
+            </form>
+
+        </div>
+    </div>
+
+    <!-- LADO DIREITO -->
+    <div class="right">
+        <img class="illustration" src="/images/Desenho da tela de login.png" alt="">
+    </div>
+
+</div>
+
+</body>
+</html>

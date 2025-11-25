@@ -1,0 +1,85 @@
+body {
+        background: #fff;
+        font-family: Arial, sans-serif;
+    }
+
+    .container-flex {
+        display: flex;
+        height: 100vh;
+    }
+
+    /* Lado esquerdo */
+    .left {
+        width: 50%;
+        background: #ffffff;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 40px;
+        text-align: center;
+    }
+
+    .logo {
+        width: 230px;
+        margin-bottom: 30px;
+    }
+
+    .form-box {
+        width: 100%;
+        max-width: 380px;
+        text-align: center;
+    }
+
+    .form-box input {
+        width: 100%;
+        padding: 13px;
+        border: none;
+        background: #d6d6d6;
+        margin-bottom: 10px;
+        border-radius: 3px;
+        font-size: 14px;
+    }
+
+    .btn-black {
+        width: 107%;
+        padding: 14px;
+        background: #000;
+        color: #fff;
+        border: none;
+        font-size: 15px;
+        margin-top: 10px;
+        cursor: pointer;
+    }
+
+    .divider {
+        width: 80%;
+        margin: 20px auto;
+        border-bottom: 1px solid #999;
+    }
+
+    .social-btn {
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 10px;
+        border-radius: 3px;
+        border: none;
+        font-size: 16px;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+    /* Lado vermelho */
+    .right {
+        width: 50%;
+        background: #ff0000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .illustration {
+        width: 85%;
+	}

@@ -1,0 +1,82 @@
+.header-custom {
+    background-color: white;
+    border-bottom: 1px solid #ddd;
+    padding: 10px 40px;
+    display: flex;       /* Isso alinha lado a lado */
+    justify-content: space-between; /* Um na ponta esquerda, outro na direita */
+    align-items: center; /* Centraliza na altura */
+    width: 100%;         /* Garante que ocupe a tela toda */
+    box-sizing: border-box; /* Evita que o padding estoure a tela */
+}
+
+.logo-img {
+    height: 60px;
+    width: auto;
+}
+
+.perfil-container {
+    height: 100%;            /* Ocupa toda altura da header */
+    display: flex;           /* Necessário para alinhar o link dentro dele */
+    align-items: center;     /* Centraliza verticalmente */
+    /* Remova o cursor: pointer daqui! Quem deve ter o cursor é o link */
+}
+
+/* LINK: Ele que deve mandar no layout interno e no clique */
+.perfil-link {
+    display: flex;           /* Torna o <a> um container flexível */
+    flex-direction: column;  /* Imagem em cima, texto embaixo */
+    align-items: center;     /* Centraliza tudo */
+    justify-content: center; 
+    
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+    
+    /* O SEGREDO ESTÁ AQUI EMBAIXO: */
+    min-width: 100px;        /* A largura mínima vai no link, não na div */
+    height: 100%;            /* Estica o link para altura total */
+    padding: 0 10px;         /* Um pouco de respiro nas laterais */
+}
+
+/* EFEITO HOVER */
+.perfil-link:hover {
+    opacity: 0.8;
+    transition: 0.2s;
+    background-color: rgba(0,0,0,0.02); /* Opcional: realça a área clicável */
+    border-radius: 8px;
+}
+
+/* IMAGEM */
+.perfil-img {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #eee;
+    margin-bottom: 2px;      /* Reduzi um pouco para caber melhor */
+}
+
+/* TEXTO */
+.perfil-link span {
+    font-family: sans-serif;
+    font-size: 14px;
+    color: #333;
+}
+
+.perfil-container:hover {
+    opacity: 0.8;
+    transition: 0.2s;
+}
+
+.perfil-container a {
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.perfil-container a:hover .perfil-img {
+    opacity: 0.8;
+}

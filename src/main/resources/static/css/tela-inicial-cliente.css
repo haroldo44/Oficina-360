@@ -1,0 +1,135 @@
+body {
+    font-family: Arial, sans-serif;
+    background: #fff;
+    margin: 0;
+}
+
+.top-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 40px;
+}
+
+.logo-top {
+    height: 40px;
+}
+
+.user-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.user-img {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+}
+
+.user-name {
+    font-size: 14px;
+}
+
+.container {
+    width: 90%;
+    margin: 0 auto;
+}
+
+.image-box img {
+    width: 100%;
+    border-radius: 10px;
+}
+
+.info-box {
+    margin: 10px 0;
+    font-size: 15px;
+}
+
+.descricao-box textarea {
+    width: 100%;
+    height: 200px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 10px;
+    resize: none;
+}
+
+.columns {
+    display: flex;
+    gap: 30px;
+    margin: 30px 0;
+}
+
+.col {
+    flex: 1;
+    background: #fafafa;
+    padding: 20px;
+    border-radius: 12px;
+    min-height: 300px;
+}
+
+.servico-card {
+    border-top: 1px solid #eee;
+    padding: 15px 0;
+}
+
+.servico-card h4 {
+    margin: 0 0 5px 0;
+}
+
+.status {
+    float: right;
+    font-size: 12px;
+}
+
+.pendente {
+    color: orange;
+}
+
+.finalizado {
+    color: green;
+}
+
+.buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.btn-red, .btn-black {
+    width: 48%;
+    padding: 15px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    color: white;
+    cursor: pointer;
+}
+
+.btn-red {
+    background: #e53935;
+}
+
+.btn-black {
+    background: #222;
+    text-align: center;
+    text-decoration: none;
+    display: block;
+}
+
+/* RESPONSIVIDADE */
+@media (max-width: 768px) {
+    .columns {
+        flex-direction: column;
+    }
+
+    .buttons {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .btn-red, .btn-black {
+        width: 100%;
+    }
+}

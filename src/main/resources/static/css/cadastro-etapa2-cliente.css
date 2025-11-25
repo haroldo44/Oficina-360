@@ -1,0 +1,81 @@
+body {
+        background: #fff;
+        font-family: Arial, sans-serif;
+    }
+
+    .container-flex {
+        display: flex;
+        height: 100vh;
+    }
+
+    /* Lado esquerdo */
+    .left {
+        width: 50%;
+        background: #ffffff;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 40px;
+        text-align: center;
+    }
+
+    .logo {
+        width: 240px;
+        margin-bottom: 15px;
+    }
+
+    .form-box {
+        width: 100%;
+        max-width: 400px;
+        text-align: center;
+    }
+
+    .form-box input {
+        width: 100%;
+        padding: 13px;
+        border: none;
+        background: #d6d6d6;
+        margin-bottom: 10px;
+        border-radius: 3px;
+        font-size: 14px;
+    }
+
+    .btn-black {
+        width: 100%;
+        padding: 14px;
+        background: #000;
+        color: #fff;
+        border: none;
+        font-size: 15px;
+        margin-top: 10px;
+        cursor: pointer;
+    }
+
+    /* Foto redonda */
+    .circle-photo {
+        width: 120px;
+        height: 120px;
+        background: #d6d6d6;
+        border-radius: 50%;
+        margin: 10px auto 5px auto;
+    }
+
+    .add-photo {
+        margin-bottom: 25px;
+        font-size: 14px;
+        color: #666;
+    }
+
+    /* Lado vermelho */
+    .right {
+        width: 50%;
+        background: #ff0000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .illustration {
+        width: 85%;
+    }

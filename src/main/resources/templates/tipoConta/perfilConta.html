@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Oficina 360 - Tipo de conta</title>
+  <link rel="stylesheet" th:href="@{/css/perfilConta.css}">
+</head>
+<body>
+
+  <div class="card">
+
+    <!-- ESQUERDA -->
+    <div class="left">
+
+      <!-- Logo: substitua o src pelo seu (pode usar th:src="@{/imagens/logo.png}") -->
+      <img class="logo" th:src="@{/images/Logo-da-oficina.png}" src="/images/Logo-da-oficina.png" alt="Oficina 360">
+
+      <div class="subtitle">Selecione uma opção</div>
+
+      <div class="options">
+        <!-- Pessoa física -->
+        <a class="option" th:href="@{/clientes/cadastro/etapa1}" href="/clientes/cadastro/etapa1" title="Pessoa física">
+          <!-- ícone: imagem (coloque seu caminho em th:src) -->
+          <img class="icon" th:src="@{/images/Icone-de-pessoa-fisica.png}" src="/images/Icone-de-pessoa-fisica.png" alt="Pessoa física">
+          <div class="label">Pessoa física</div>
+        </a>
+
+        <!-- Pessoa jurídica -->
+        <a class="option" th:href="@{/oficinas/cadastro/etapa1}" href="/oficinas/cadastro/etapa1" title="Pessoa jurídica">
+          <img class="icon" th:src="@{/images/Icone-de-pessoa-juridica.png}" src="/images/Icone-de-pessoa-juridica.png" alt="Pessoa jurídica">
+          <div class="label">Pessoa jurídica</div>
+        </a>
+      </div>
+
+    </div>
+
+    <!-- DIREITA (imagem inteira dentro do quadrado vermelho) -->
+    <div class="right">
+    	<img class="illustration"
+        	 th:src="@{/images/desenho_escolha_tipo.png}"
+         	src="/images/desenho_escolha_tipo.png"
+         	alt="Ilustração Oficina">
+	</div>
+	
+  </div>
+
+
+</body>
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+    <footer th:fragment="rodape" class="footer-custom">
+        
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+        <style>
+            .footer-custom {
+                background-color: white;
+                padding: 40px 20px;      /* Espaço em cima/baixo e lados */
+                text-align: center;      /* Centraliza tudo */
+                border-top: 1px solid #eee; /* Linha cinza separando do conteúdo */
+                font-family: sans-serif;
+                color: #333;
+            }
+
+            .footer-logo {
+                height: 40px;            /* Tamanho do logo */
+                width: auto;
+                margin-bottom: 20px;     /* Espaço abaixo do logo */
+            }
+
+            .footer-titulo {
+                font-weight: bold;
+                margin-bottom: 5px;
+                font-size: 16px;
+            }
+
+            .footer-info {
+                margin: 5px 0;           /* Espaçamento entre linhas de texto */
+                font-size: 14px;
+            }
+
+            .social-icons {
+                margin-top: 20px;        /* Espaço acima dos ícones */
+                font-size: 24px;         /* Tamanho dos ícones */
+            }
+
+            .social-icons a {
+                color: #000;             /* Cor dos ícones (Preto) */
+                margin: 0 10px;          /* Espaço entre um ícone e outro */
+                text-decoration: none;
+                transition: color 0.3s;
+            }
+
+            .social-icons a:hover {
+                color: #555;             /* Cor ao passar o mouse (cinza escuro) */
+            }
+        </style>
+
+        <img th:src="@{/images/logo-da-oficina.png}" alt="Oficina 360" class="footer-logo">
+
+        <p class="footer-titulo">Contatos</p>
+        <p class="footer-info">oficina360@gmail.com</p>
+        <p class="footer-info">+55 83 9264-4587</p>
+
+        <div class="social-icons">
+            <a href="#"><i class="fa-brands fa-instagram"></i></a>
+            <a href="#"><i class="fa-brands fa-twitter"></i></a>
+            <a href="#"><i class="fa-brands fa-facebook-f"></i></a>
+        </div>
+
+    </footer>
+
+</body>
+</html>

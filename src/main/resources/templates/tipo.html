@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Selecionar tipo de conta - Oficina360</title>
+
+    <style>
+
+        /* FUNDO — SUA IMAGEM DA JANELA */
+        body {
+            margin: 0;
+            padding: 0;
+            background: #fff;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            background-image: url('C:/Users/haroldo/Documents/workspace-spring-tools-for-eclipse-4.32.0.RELEASE/Oficina360/src/main/resources/static/images/Tela-de-escolha-entre-pessoa-e-empresa.png');
+            background-repeat: no-repeat;
+            background-size: contain;
+            background-position: center;
+        }
+
+        /* ÁREA BRANCA (lado esquerdo) */
+        .white-box {
+            position: absolute;
+            left: 14%;
+            top: 80%;
+            transform: translateY(-50%);
+            width: 480px;
+            height: 550px;
+            background: transparent; /* fundo já existe na imagem */
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+
+        .select-text {
+            font-size: 14px;
+            margin-bottom: 45px;
+        }
+
+        /* CONTAINER DOS ÍCONES */
+        .options {
+            display: flex;
+            justify-content: center;
+            gap: 80px;
+            margin-top: 20px;
+        }
+
+        .option-item {
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .option-item img {
+            width: 120px;
+            height: 90px;
+            margin-bottom: 10px;
+        }
+
+        .option-item p {
+            font-size: 14px;
+            margin-top: 7px;
+        }
+
+        .option-item:hover {
+            opacity: 0.7;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="white-box">
+
+    <div class="select-text">Selecione uma opção</div>
+
+    <div class="options">
+
+        <div class="option-item" onclick="window.location.href='/cadastro/pessoa-fisica'">
+            <img src="C:\Users\haroldo\Documents\workspace-spring-tools-for-eclipse-4.32.0.RELEASE\Oficina360\src\main\resources\static\images\Icone-de-pessoa-fisica.png">
+            <p>Pessoa física</p>
+        </div>
+
+        <div class="option-item" onclick="window.location.href='/cadastro/pessoa-juridica'">
+            <img src="C:\Users\haroldo\Documents\workspace-spring-tools-for-eclipse-4.32.0.RELEASE\Oficina360\src\main\resources\static\images\Icone-de-pessoa-juridica.png">
+            <p>Pessoa jurídica</p>
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil do Proprietário</title>
+
+    <link rel="stylesheet" th:href="@{/css/perfil-mecanico.css}">
+</head>
+
+<body>
+
+<header th:replace="~{fragments/header :: cabecalho}"></header>
+
+<div class="container">
+
+    <h2 class="titulo">Perfil do Proprietário</h2>
+
+    <!-- FOTO DO PROPRIETÁRIO -->
+    <div class="foto-box">
+
+        <img id="previewFotoProprietario"
+             th:src="${oficina.fotoProprietario != null} ?
+                     @{'/uploads/' + ${oficina.fotoProprietario}} :
+                     @{/images/perfil-default.png}"
+             alt="Foto do proprietário">
+
+    </div>
+
+    <!-- BOTÃO PARA ALTERAR FOTO (FORA DA FOTO) -->
+    <button class="btn-alterar-foto" onclick="document.getElementById('inputFotoProprietario').click();">
+        Alterar foto de perfil
+    </button>
+
+    <!-- FORM QUE ENVIA A NOVA FOTO -->
+    <form th:action="@{/oficinas/alterar-foto-proprietario/{id}(id=${oficina.id})}"
+          method="post"
+          enctype="multipart/form-data">
+
+        <input type="file"
+               id="inputFotoProprietario"
+               name="novaFotoProprietario"
+               accept="image/*"
+               style="display:none"
+               onchange="previewAndSubmit(event, this.form)">
+    </form>
+
+    <!-- CAMPOS -->
+    <div class="form">
+
+        <label>Nome</label>
+        <input type="text" th:value="${oficina.nomeDoProprietario}" disabled>
+
+        <label>Email</label>
+        <input type="text" th:value="${oficina.email}" disabled>
+
+        <label>Telefone</label>
+        <input type="text" th:value="${oficina.telefoneDoProprietario}" disabled>
+
+        <label>Cidade</label>
+        <input type="text" th:value="${oficina.cidadeDoProprietario}" disabled>
+
+        <label>Bairro</label>
+        <input type="text" th:value="${oficina.bairroDoProprietario}" disabled>
+
+        <label>Rua</label>
+        <input type="text" th:value="${oficina.ruaDoProprietario}" disabled>
+
+        <!-- BOTÃO EXCLUIR CONTA -->
+        <button class="btn-excluir" onclick="abrirModal()">EXCLUIR CONTA</button>
+    </div>
+
+    <!-- MODAL -->
+    <div id="modalConfirmar" class="modal">
+        <div class="modal-content">
+
+            <h3>Tem certeza que deseja excluir sua conta?</h3>
+            <p>Esta ação não pode ser desfeita.</p>
+
+            <div class="modal-botoes">
+
+                <form th:action="@{/oficinas/excluir/{id}(id=${oficina.id})}" method="post">
+    			<button type="submit" class="btn-excluir">Excluir Conta</button>
+				</form>
+
+                <button class="btn-cancelar" onclick="fecharModal()">Cancelar</button>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<footer th:replace="~{fragments/footer :: rodape}"></footer>
+
+<script>
+function abrirModal() {
+    document.getElementById("modalConfirmar").style.display = "flex";
+}
+
+function fecharModal() {
+    document.getElementById("modalConfirmar").style.display = "none";
+}
+
+function previewAndSubmit(event, form) {
+    const reader = new FileReader();
+    reader.onload = function() {
+        document.getElementById("previewFotoProprietario").src = reader.result;
+    };
+    reader.readAsDataURL(event.target.files[0]);
+    setTimeout(() => form.submit(), 300);
+}
+</script>
+
+</body>
+</html>

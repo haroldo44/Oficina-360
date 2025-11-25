@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<header th:fragment="cabecalho" class="header-custom">
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+
+    <!-- LOGO → volta para home da oficina SE existir oficina -->
+    <div class="logo-area">
+
+        <!-- Se existir oficina, vai para a home da oficina -->
+        <a th:if="${oficina != null}" th:href="@{/oficinas/home/{id}(id=${oficina.id})}">
+            <img th:src="@{/images/logo-da-oficina.png}" alt="Oficina 360" class="logo-img">
+        </a>
+
+        <!-- Se NÃO existir oficina, volta para página inicial (ou login) -->
+        <a th:if="${oficina == null}" th:href="@{/}">
+            <img th:src="@{/images/logo-da-oficina.png}" alt="Oficina 360" class="logo-img">
+        </a>
+
+    </div>
+
+
+    <!-- ========================= PERFIL DO USUÁRIO ========================= -->
+    <!-- Mostra perfil SOMENTE quando oficina existe -->
+    <div class="perfil-container" th:if="${oficina != null}">
+
+        <a th:href="@{/oficinas/perfil/{id}(id=${oficina.id})}" class="perfil-link">
+
+            <!-- FOTO DO PROPRIETÁRIO -->
+            <img class="perfil-img"
+                 th:if="${oficina.fotoProprietario != null}"
+                 th:src="@{'/uploads/' + ${oficina.fotoProprietario}}"
+                 alt="Foto">
+
+            <img class="perfil-img"
+                 th:if="${oficina.fotoProprietario == null}"
+                 th:src="@{/images/perfil-default.png}"
+                 alt="Sem foto">
+
+            <span th:text="${oficina.nomeDoProprietario}">Nome</span>
+
+        </a>
+
+    </div>
+
+
+    <!-- ========================= QUANDO NÃO TEM OFICINA ========================= -->
+    <div class="perfil-container" th:if="${oficina == null}">
+        <a th:href="@{/login}" class="perfil-link">
+            <img class="perfil-img" th:src="@{/images/perfil-default.png}" alt="Perfil">
+            <span>Entrar</span>
+        </a>
+    </div>
+
+</header>
+
+</body>
+</html>

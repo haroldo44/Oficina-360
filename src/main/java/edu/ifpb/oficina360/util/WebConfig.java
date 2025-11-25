@@ -1,0 +1,17 @@
+package edu.ifpb.oficina360.util;
+
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+@Configuration
+public class WebConfig implements WebMvcConfigurer {
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/uploads/**")
+                // ERRADO: "file:uploads" (sem barra no final)
+                // CERTO:  "file:uploads/" (COM barra no final)
+                .addResourceLocations("file:uploads/"); 
+    }
+}
+

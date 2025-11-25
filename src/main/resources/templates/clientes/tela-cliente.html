@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página do Cliente</title>
+    <link rel="stylesheet" th:href="@{/css/tela-inicial-cliente.css}">
+</head>
+<body>
+
+<!-- FOOTER -->
+<header th:replace="~{fragments/header :: cabecalho}"></header>
+
+<div class="container">
+
+    <!-- IMAGEM DA OFICINA -->
+    <div class="image-box">
+        <img th:src="@{'/uploads/' + ${oficina.imagem}}" alt="Imagem da Oficina">
+    </div>
+
+    <div class="info-box">
+        <p><strong>Nome:</strong> <span th:text="${oficina.nome}"></span></p>
+        <p><strong>ID:</strong> <span th:text="${oficina.id}"></span></p>
+    </div>
+
+    <!-- DESCRIÇÃO -->
+    <div class="descricao-box">
+        <textarea disabled th:text="${oficina.descricao}"></textarea>
+    </div>
+
+    <!-- COLUNAS -->
+    <div class="columns">
+
+        <!-- SERVIÇOS AGENDADOS -->
+        <div class="col">
+            <h3>Serviços agendados</h3>
+
+            <div class="servico-card" th:each="s : ${servicosAgendados}">
+                <h4 th:text="${s.titulo}"></h4>
+                <span class="status pendente">Pendente</span>
+                <p th:text="${s.descricao}"></p>
+            </div>
+        </div>
+
+        <!-- SERVIÇOS FINALIZADOS -->
+        <div class="col">
+            <h3>Serviços finalizados</h3>
+
+            <div class="servico-card" th:each="s : ${servicosFinalizados}">
+                <h4 th:text="${s.titulo}"></h4>
+                <span class="status finalizado">Finalizado</span>
+                <p th:text="${s.descricao}"></p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- BOTÕES -->
+    <div class="buttons">
+        <button class="btn-red">Urgência</button>
+        <a th:href="@{/clientes/solicitar-servico}" class="btn-black">Solicitar serviço</a>
+    </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer th:replace="~{fragments/footer :: rodape}"></footer>
+</body>
+</html>
