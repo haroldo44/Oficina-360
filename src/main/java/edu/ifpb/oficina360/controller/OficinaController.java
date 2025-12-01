@@ -35,7 +35,7 @@ public class OficinaController {
     @Autowired 
     private MecanicoService mecanicoService;
 
-
+    
     // ===================== ETAPA 1 =====================
     @GetMapping("/cadastro/etapa1")
     public String etapa1(HttpSession session, Model model) {
@@ -207,64 +207,25 @@ public class OficinaController {
     	return "redirect:/"; 
     }
     
- // ===================== NOVO: ADICIONAR MECÂNICO (POST) =====================
-//    @PostMapping("/adicionar-mecanico/{oficinaId}")
-//    public String adicionarMecanico(
-//            @PathVariable Long oficinaId,
-//            @ModelAttribute("mecanicoDto") @Valid MecanicoCadastroDTO dto,
-//            BindingResult result,
-//            @RequestParam("fotoPerfil") MultipartFile fotoPerfil,
-//            RedirectAttributes attr) {
-//        
-//        // 1. VERIFICAÇÃO DE VALIDAÇÃO (Campos de texto/horário)
-//        if (result.hasErrors()) {
-//            attr.addFlashAttribute("erro", "Verifique os campos do formulário de mecânico.");
-//            attr.addFlashAttribute("org.springframework.validation.BindingResult.mecanicoDto", result);
-//            attr.addFlashAttribute("mecanicoDto", dto); // Manter dados preenchidos
-//            return "redirect:/oficinas/home/" + oficinaId;
-//        }
-//        
-//        // 2. ATENÇÃO: ANEXAR O ARQUIVO MULTIPART AO DTO!
-//        // Esta linha é crucial e estava faltando/fora de lugar.
-//        dto.setFotoArquivo(fotoPerfil); 
-//        
-//        try {
-//            mecanicoService.salvarMecanico(dto, oficinaId);
-//            attr.addFlashAttribute("sucesso", "Mecânico adicionado com sucesso!");
-//        } catch (DateTimeParseException e) {
-//            // Se o horário for inválido (string vazia ou formato errado)
-//            System.err.println("ERRO DE PARSE DE HORÁRIO: " + e.getMessage());
-//            e.printStackTrace();
-//            attr.addFlashAttribute("erro", "Erro de formato no horário: Use HH:mm e preencha todos os campos de turno.");
-//        } catch (IOException e) {
-//            // Se a foto falhar (pasta 'uploads' inexistente ou sem permissão)
-//            System.err.println("ERRO DE ARQUIVO: " + e.getMessage());
-//            e.printStackTrace();
-//            attr.addFlashAttribute("erro", "Erro ao salvar foto: Verifique permissões/existência da pasta 'uploads'.");
-//        } catch (Exception e) {
-//            // Captura DataIntegrityViolationException (NOT NULL) ou outras exceções
-//            System.err.println("ERRO GERAL: " + e.getMessage());
-//            e.printStackTrace();
-//            attr.addFlashAttribute("erro", "Erro desconhecido ao adicionar mecânico. Detalhes no console.");
-//        }
-//        
-//        return "redirect:/oficinas/home/" + oficinaId;
-//    }
+    // Login
+    @PostMapping("/login")
+    public String login(@RequestParam String email,
+                        @RequestParam String senha,
+                        HttpSession session,
+                        RedirectAttributes attr) {
 
-    // ===================== NOVO: REMOVER MECÂNICO (POST) =====================
-    @PostMapping("/remover-mecanico/{mecanicoId}/{oficinaId}")
-    public String removerMecanico(
-            @PathVariable Long mecanicoId,
-            @PathVariable Long oficinaId,
-            RedirectAttributes attr) {
-        
-        try {
-            mecanicoService.removerMecanico(mecanicoId);
-            attr.addFlashAttribute("sucesso", "Mecânico removido com sucesso!");
-        } catch (Exception e) {
-            attr.addFlashAttribute("erro", "Erro ao remover mecânico.");
+        Oficina oficina = oficinaService.buscarPorEmail(email);
+
+        if (oficina.getSenha().equals(senha)) {
+            // guarda o usuário logado na sessão
+            session.setAttribute("usuarioLogado", oficina);
+
+            // redireciona para a tela inicial da empresa
+            return "redirect:/oficinas/home/" + oficina.getId();
+        } else {
+            attr.addFlashAttribute("erro", "Email ou senha inválidos!");
+            return "redirect:/login"; // volta para tela de login
         }
-        
-        return "redirect:/oficinas/home/" + oficinaId;
     }
+
 }

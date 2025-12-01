@@ -2,20 +2,21 @@ package edu.ifpb.oficina360.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import edu.ifpb.oficina360.model.Cliente;
+import edu.ifpb.oficina360.model.ClienteCadastroDTO;
 import edu.ifpb.oficina360.model.Oficina;
 import edu.ifpb.oficina360.service.ClienteService;
 import edu.ifpb.oficina360.service.OficinaService;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
 @Controller
 @RequestMapping("/clientes")
-@SessionAttributes("cliente") // mantém o cliente entre etapas
 public class ClienteController {
 
     @Autowired
@@ -24,31 +25,30 @@ public class ClienteController {
     @Autowired
     private OficinaService oficinaService;
 
-
     // ===================== ETAPA 1 =====================
+    
     @GetMapping("/cadastro/etapa1")
-    public String etapa1(ModelMap model) {
-        if (!model.containsAttribute("cliente")) {
-            model.addAttribute("cliente", new Cliente());
+    public String etapa1(Model model) {
+        if (!model.containsAttribute("dto")) {
+            model.addAttribute("dto", new ClienteCadastroDTO());
         }
-        return "/clientes/cadastro-etapa1";
+        return "clientes/cadastro-etapa1";
     }
-
-    @PostMapping("/cadastro/etapa2")
-    public String salvarEtapa1(
-            @Valid @ModelAttribute("cliente") Cliente cliente,
-            BindingResult result,
-            RedirectAttributes attr) {
-
-        // valida campos obrigatórios
-        if (result.hasFieldErrors("email") || result.hasFieldErrors("senha")) {
-            return "/clientes/cadastro-etapa1";
+    
+    @PostMapping("/cadastro/etapa1")
+    public String salvarEtapa1(@ModelAttribute("dto") @Valid ClienteCadastroDTO dto,
+                               BindingResult result,
+                               HttpSession session) {
+        if (result.hasErrors()) {
+            return "clientes/cadastro-etapa1";
         }
 
-        if (!cliente.getSenha().equals(cliente.getConfirmarSenha())) {
-            result.rejectValue("confirmarSenha", "error.cliente", "As senhas não conferem.");
-            return "/clientes/cadastro-etapa1";
+        if (!dto.getSenha().equals(dto.getConfirmarSenha())) {
+            result.rejectValue("confirmarSenha", null, "As senhas não conferem.");
+            return "clientes/cadastro-etapa1";
         }
+
+        session.setAttribute("cadastroCliente", dto);
 
         return "redirect:/clientes/cadastro/etapa2";
     }
@@ -56,23 +56,25 @@ public class ClienteController {
 
     // ===================== ETAPA 2 =====================
     @GetMapping("/cadastro/etapa2")
-    public String etapa2(@ModelAttribute("cliente") Cliente cliente) {
-
-        if (cliente.getEmail() == null) {
+    public String etapa2(HttpSession session, Model model) {
+        ClienteCadastroDTO dto = (ClienteCadastroDTO) session.getAttribute("cadastroCliente");
+        if (dto == null) {
             return "redirect:/clientes/cadastro/etapa1";
         }
-
-        return "/clientes/cadastro-etapa2";
+        model.addAttribute("dto", dto);
+        return "clientes/cadastro-etapa2";
     }
 
-    @PostMapping("/cadastro/etapa3")
-    public String salvarEtapa2(
-            @Valid @ModelAttribute("cliente") Cliente cliente,
-            BindingResult result) {
+    @PostMapping("/cadastro/etapa2")
+    public String salvarEtapa2(@ModelAttribute("dto") @Valid ClienteCadastroDTO dto,
+                               BindingResult result,
+                               HttpSession session) {
 
         if (result.hasFieldErrors("nome") || result.hasFieldErrors("cpf")) {
-            return "/clientes/cadastro-etapa2";
+            return "clientes/cadastro-etapa2";
         }
+
+        session.setAttribute("cadastroCliente", dto);
 
         return "redirect:/clientes/cadastro/etapa3";
     }
@@ -80,44 +82,108 @@ public class ClienteController {
 
     // ===================== ETAPA 3 =====================
     @GetMapping("/cadastro/etapa3")
-    public String etapa3(@ModelAttribute("cliente") Cliente cliente) {
+    public String etapa3(HttpSession session, Model model) {
+        ClienteCadastroDTO dto = (ClienteCadastroDTO) session.getAttribute("cadastroCliente");
 
-        if (cliente.getEmail() == null) {
+        if (dto == null) {
             return "redirect:/clientes/cadastro/etapa1";
         }
 
-        return "/clientes/cadastro-etapa3";
+        model.addAttribute("dto", dto);
+        return "clientes/cadastro-etapa3";
     }
 
-    @PostMapping("/salvar-final")
-    public String salvarFinal(
-            @ModelAttribute("cliente") Cliente cliente,
-            RedirectAttributes attr) {
-        try {
+    @PostMapping("/cadastro/etapa3")
+    public String salvarEtapa3(@ModelAttribute("dto") ClienteCadastroDTO dto,
+                               HttpSession session) {
 
-            // 1. Verifica se a oficina foi selecionada e obtém o ID
-            if (cliente.getOficina() == null || cliente.getOficina().getId() == null) {
-                throw new IllegalArgumentException("O ID da Oficina não pode ser nulo.");
-            }
-            Long idOficina = cliente.getOficina().getId();
-
-            // 2. Busca a entidade Oficina (o service lança a exceção se não encontrar)
-            Oficina oficina = oficinaService.buscarPorId(idOficina);
-
-            // 3. Define a oficina no cliente (associação)
-            cliente.setOficina(oficina);
-
-            // 4. Salva o cliente
-            clienteService.cadastrarCliente(cliente);
-
-            attr.addFlashAttribute("sucesso", "Conta criada com sucesso!");
-            
-            // Retorna ao início do cadastro ou à página de login
-            return "redirect:/clientes/cadastro/etapa1"; 
-
-        } catch (Exception e) {
-            attr.addFlashAttribute("erro", e.getMessage());
-            return "redirect:/clientes/cadastro/etapa3";
+        if (dto.getOficinaId() == null) {
+            return "clientes/cadastro-etapa3";
         }
+
+        ClienteCadastroDTO dtoSessao =
+                (ClienteCadastroDTO) session.getAttribute("cadastroCliente");
+
+        dtoSessao.setOficinaId(dto.getOficinaId());
+
+        session.setAttribute("cadastroCliente", dtoSessao);
+
+        // 🔥 Aqui estava o erro. Agora chamamos POST → POST (sem 405)
+        return "forward:/clientes/salvar-final";
+    }
+
+
+    // ===================== SALVAR FINAL =====================
+    @PostMapping("/salvar-final")
+    public String salvarFinal(HttpSession session) {
+
+        ClienteCadastroDTO dto = (ClienteCadastroDTO)
+                session.getAttribute("cadastroCliente");
+
+        if (dto == null) {
+            return "redirect:/clientes/cadastro/etapa1";
+        }
+
+        Cliente cliente = new Cliente();
+        cliente.setEmail(dto.getEmail());
+        cliente.setSenha(dto.getSenha());
+        cliente.setNome(dto.getNome());
+        cliente.setCpf(dto.getCpf());
+        cliente.setCidade(dto.getCidade());
+        cliente.setBairro(dto.getBairro());
+        cliente.setRua(dto.getRua());
+
+        Oficina oficina = oficinaService.buscarPorId(dto.getOficinaId());
+        cliente.setOficina(oficina);
+
+        clienteService.salvar(cliente);
+
+        session.removeAttribute("cadastroCliente");
+
+        return "redirect:/login";
+    }
+
+
+    // ===================== LOGIN =====================
+    @PostMapping("/login")
+    public String login(@RequestParam String email,
+                        @RequestParam String senha,
+                        HttpSession session,
+                        RedirectAttributes attr) {
+
+        Cliente cliente = clienteService.buscarPorEmail(email);
+
+        if (cliente != null && cliente.getSenha().equals(senha)) {
+            session.setAttribute("usuarioLogado", cliente);
+            return "redirect:/clientes/home/" + cliente.getId();
+        }
+
+        attr.addFlashAttribute("erro", "Email ou senha inválidos!");
+        return "redirect:/login";
+    }
+
+
+    // ===================== PERFIL =====================
+    @GetMapping("/perfil/{id}")
+    public String perfilCliente(@PathVariable Long id, Model model) {
+        Cliente cliente = clienteService.buscarPorId(id);
+        if (cliente == null) {
+            return "redirect:/";
+        }
+        model.addAttribute("cliente", cliente);
+        return "clientes/perfil";
+    }
+
+
+    // ===================== EXCLUIR =====================
+    @PostMapping("/excluir/{id}")
+    public String excluirCliente(@PathVariable Long id, RedirectAttributes attr) {
+        try {
+            clienteService.deletarCliente(id);
+            attr.addFlashAttribute("sucesso", "Conta excluída com sucesso!");
+        } catch (Exception e) {
+            attr.addFlashAttribute("erro", "Erro ao excluir conta: " + e.getMessage());
+        }
+        return "redirect:/";
     }
 }

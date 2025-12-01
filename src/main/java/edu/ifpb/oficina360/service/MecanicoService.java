@@ -5,7 +5,7 @@ import edu.ifpb.oficina360.model.MecanicoCadastroDTO;
 import edu.ifpb.oficina360.model.Oficina;
 import edu.ifpb.oficina360.repository.MecanicoRepository;
 import edu.ifpb.oficina360.repository.OficinaRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -97,4 +97,35 @@ public class MecanicoService {
     public void removerMecanico(Long mecanicoId) {
         mecanicoRepository.deleteById(mecanicoId);
     }
+    
+    public void editarMecanico(Long id, MecanicoCadastroDTO dto) {
+        Mecanico mecanico = mecanicoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Mecânico não encontrado com id: " + id));
+
+        mecanico.setNomeCompleto(dto.getNomeCompleto());
+        mecanico.setEmail(dto.getEmail());
+        mecanico.setSenha(dto.getSenha());
+        mecanico.setNumeroTelefone(dto.getNumeroTelefone());
+        mecanico.setTurnoManhaInicio(LocalTime.parse(dto.getTurnoManhaInicioString()));
+        mecanico.setTurnoManhaFim(LocalTime.parse(dto.getTurnoManhaFimString()));
+        mecanico.setTurnoTardeInicio(LocalTime.parse(dto.getTurnoTardeInicioString()));
+        mecanico.setTurnoTardeFim(LocalTime.parse(dto.getTurnoTardeFimString()));
+
+        // Atualiza a foto se foi enviada
+        if (dto.getFotoArquivo() != null && !dto.getFotoArquivo().isEmpty()) {
+            try {
+                String nomeArquivo = salvarFoto(dto.getFotoArquivo()); // método que grava no disco
+                mecanico.setNomeArquivoFoto(nomeArquivo);
+            } catch (IOException e) {
+                throw new RuntimeException("Erro ao salvar foto do mecânico: " + e.getMessage(), e);
+            }
+        }
+
+        mecanicoRepository.save(mecanico);
+    }
+
+    
+    
+
+
 }

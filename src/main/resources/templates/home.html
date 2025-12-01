@@ -2,50 +2,50 @@
 <html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Oficina 360 - Login</title>
-	<link rel="stylesheet" th:href="@{/css/home.css}">
+    <link rel="stylesheet" th:href="@{/css/home.css}">
 </head>
-
 <body>
+<div class="container">
 
-    <div class="container">
+    <div class="left-side">
+        <img src="/images/Logo-da-oficina.png" class="logo" alt="Oficina 360">
+        <p class="welcome-text">Bem-vindo</p>
 
-        <!-- LEFT SIDE -->
-        <div class="left-side">
-
-            <!-- SUA LOGO AQUI -->
-            <img src="/images/Logo-da-oficina.png" class="logo" alt="Oficina 360">
-
-            <p class="welcome-text">Bem vindo</p>
-
-            <input type="email" class="input-box" placeholder="Digite seu email">
-            <input type="password" class="input-box" placeholder="Digite sua senha">
-
-            <div class="forgot-password">
-                <a href="#" style="color:black; text-decoration:none;">Esqueceu sua senha?</a>
-            </div>
-
-            <button class="btn-login">LOGIN</button>
-
-            <div class="divider">
-                <span></span> OU <span></span>
-            </div>
-
-            <div class="create-account">
-                Não tem uma conta?
-                <a href="/tipoDeContas/escolhaTipo">Criar conta</a>
-            </div>
-
+        <!-- Mensagens de erro ou logout -->
+        <div th:if="${param.error}" class="alert alert-danger">
+            Email ou senha inválidos.
+        </div>
+        <div th:if="${param.logout}" class="alert alert-success">
+            Você saiu com sucesso.
         </div>
 
-        <!-- RIGHT SIDE (IMAGEM GRANDE) -->
-        <div class="right-side">
-            <img src="/images/Desenho da tela de login.png" alt="imagem-login">
+        <!-- FORMULÁRIO DE LOGIN -->
+        <form th:action="@{/oficinas/login}" method="post">
+    		<input type="email" name="email" class="input-box" placeholder="Digite seu email" required>
+    		<input type="password" name="senha" class="input-box" placeholder="Digite sua senha" required>
+
+    		<div class="forgot-password">
+        	<a href="#" style="color:black; text-decoration:none;">Esqueceu sua senha?</a>
+    		</div>
+
+    		<button type="submit" class="btn-login">LOGIN</button>
+		</form>
+
+        <div class="divider">
+            <span></span> OU <span></span>
         </div>
 
+        <div class="create-account">
+            Não tem uma conta?
+            <a href="/tipoDeContas/escolhaTipo">Criar conta</a>
+        </div>
     </div>
 
+    <div class="right-side">
+        <img src="/images/Desenho da tela de login.png" alt="imagem-login">
+    </div>
+
+</div>
 </body>
 </html>

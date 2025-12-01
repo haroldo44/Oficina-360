@@ -23,7 +23,6 @@
     <h2 class="titulo-centro">Imagem da oficina</h2>
 
     <div class="foto-oficina-box">
-
         <img class="foto-oficina"
              th:src="@{'/uploads/' + ${oficina.imagem}} + '?v=' + ${#dates.createNow().time}"
              id="previewFotoOficina"
@@ -36,7 +35,6 @@
         <form th:action="@{/oficinas/alterar-foto/{id}(id=${oficina.id})}"
               method="post"
               enctype="multipart/form-data">
-
             <input type="file"
                    id="inputFotoOficina"
                    name="novaFoto"
@@ -44,7 +42,6 @@
                    style="display:none"
                    onchange="previewAndSubmit(event, this.form)">
         </form>
-
     </div>
 
     <p class="id-oficina">ID: <span th:text="${oficina.id}"></span></p>
@@ -62,7 +59,6 @@
           method="post">
 
         <div class="info-container">
-
             <div class="info-col-esq">
                 <label>Nome</label>
                 <input type="text" name="nomeDaOficina" th:value="${oficina.nomeDaOficina}" class="campo-editavel" readonly>
@@ -81,7 +77,6 @@
             </div>
 
             <div class="info-col-dir">
-
                 <label>Número de telefone</label>
                 <input type="text" name="telefoneDoProprietario" th:value="${oficina.telefoneDoProprietario}" class="campo-editavel" readonly>
 
@@ -89,13 +84,10 @@
                 <textarea rows="11" name="descricao" class="campo-editavel" readonly
                           th:text="${oficina.descricao}">
                 </textarea>
-
             </div>
-
         </div>
 
         <button id="btnSalvarForm" type="submit" style="display:none;"></button>
-
     </form>
 
     <h2 class="titulo-centro">Mecânicos</h2>
@@ -105,36 +97,47 @@
         <button class="btn-adicionar" onclick="document.getElementById('modalAdicionarMecanico').style.display='block'">Adicionar</button>
     </div>
 
-    <div class="mecanicos-grid">
+<div class="mecanicos-grid">
+    <div class="card-mecanico"
+         th:each="mecanico : ${mecanicos}"
+         th:id="'mecanico-' + ${mecanico.id}"
+         th:attr="data-id=${mecanico.id},
+                  data-nome=${mecanico.nomeCompleto},
+                  data-email=${mecanico.email},
+                  data-senha=${mecanico.senha},
+                  data-telefone=${mecanico.numeroTelefone},
+                  data-manha-inicio=${mecanico.turnoManhaInicio},
+                  data-manha-fim=${mecanico.turnoManhaFim},
+                  data-tarde-inicio=${mecanico.turnoTardeInicio},
+                  data-tarde-fim=${mecanico.turnoTardeFim}"
+         onclick="abrirModalEdicao(this)"
+         style="cursor:pointer;">
 
-        <div class="card-mecanico" th:each="mecanico : ${mecanicos}" th:id="'mecanico-' + ${mecanico.id}">
-            
-            <img th:if="${mecanico.nomeArquivoFoto != null and mecanico.nomeArquivoFoto != ''}"
-                 th:src="@{'/uploads/' + ${mecanico.nomeArquivoFoto}} + '?v=' + ${#dates.createNow().time}"
-                 alt="Mecânico">
-                 
-            <img th:unless="${mecanico.nomeArquivoFoto != null and mecanico.nomeArquivoFoto != ''}"
-                 th:src="@{/images/perfil-default.png}"
-                 alt="Sem Foto">
+        <img th:if="${mecanico.nomeArquivoFoto != null and mecanico.nomeArquivoFoto != ''}"
+             th:src="|/uploads/${mecanico.nomeArquivoFoto}?v=${#dates.createNow().time}|"
+             alt="Mecânico">
+        <img th:unless="${mecanico.nomeArquivoFoto != null and mecanico.nomeArquivoFoto != ''}"
+             th:src="@{/images/perfil-default.png}"
+             alt="Sem Foto">
 
-            <p class="nome-mecanico" th:text="${mecanico.nomeCompleto}"></p>
-            
-            <form th:action="@{/mecanicos/remover/{mecanicoId}/{oficinaId}(mecanicoId=${mecanico.id}, oficinaId=${oficina.id})}"
-                  method="post"
-                  class="form-remover-mecanico"
-                  style="display:none;">
-                <input type="hidden" name="idMecanico" th:value="${mecanico.id}">
-                <button type="submit" class="btn-submit-remover" title="Confirmar Remoção">X</button>
-            </form>
-        </div>
-        
-        <p th:if="${#lists.isEmpty(mecanicos)}" style="grid-column: span 4; text-align: center; color: #666;">
-            Nenhum mecânico cadastrado.
-        </p>
+        <p class="nome-mecanico" th:text="${mecanico.nomeCompleto}"></p>
+
+        <button class="btn-remover-individual"
+                th:attr="onclick='removerMecanico(' + ${mecanico.id} + ',' + ${oficina.id} + ')'"
+                style="display:none;">
+            Remover
+        </button>
     </div>
+
+    <p th:if="${#lists.isEmpty(mecanicos)}"
+       style="grid-column: span 4; text-align: center; color: #666;">
+        Nenhum mecânico cadastrado.
+    </p>
+</div>
 
 </div> 
 
+<!-- Modal de cadastro de mecânico -->
 <div id="modalAdicionarMecanico" class="modal-custom" style="display:none;">
     <div class="modal-content-custom">
         <span class="close-btn" onclick="document.getElementById('modalAdicionarMecanico').style.display='none'">&times;</span>
@@ -148,47 +151,51 @@
 
             <div style="text-align: center; margin-bottom: 20px;">
                 <label for="inputFotoMecanico" style="cursor: pointer;">
-                    <img th:src="@{/images/perfil-default.png}" style="width: 80px; height: 80px; border-radius: 50%; border: 1px solid #ddd;" alt="Adicionar foto">
+                    <img th:src="@{/images/Perfil.png}" style="width: 80px; height: 80px; border-radius: 50%; border: 0px solid #ddd;" alt="Adicionar foto">
                     <p>Adicionar foto</p>
                 </label>
                 <input type="file" id="inputFotoMecanico" name="fotoPerfil" accept="image/*" style="display:none;">
             </div>
             
             <label for="nomeCompleto">Nome completo</label>
-            <input type="text" id="nomeCompleto" name="nomeCompleto" th:field="*{nomeCompleto}" required>
+            <input type="text" id="nomeCompleto" th:field="*{nomeCompleto}" required minlength="3" maxlength="100"
+                   pattern="^[A-Za-zÀ-ÿ\s]+$" title="Digite apenas letras e espaços.">
+
             <label for="email">Crie um email</label>
-            <input type="email" id="email" name="email" th:field="*{email}" required>
+            <input type="email" id="email" th:field="*{email}" required title="Digite um email válido.">
 
             <label for="senha">Crie uma senha</label>
-            <input type="password" id="senha" name="senha" th:field="*{senha}" required>
+            <input type="password" id="senha" th:field="*{senha}" required minlength="3" maxlength="20"
+                   title="A senha deve ter no mínimo 6 caracteres.">
 
             <label for="telefone">N° Telefone</label>
-            <input type="tel" id="telefone" name="numeroTelefone" th:field="*{numeroTelefone}" required>
+            <input type="tel" id="telefone" th:field="*{numeroTelefone}" required 
+                   pattern="\(\d{2}\)\s\d{4,5}-\d{4}" placeholder="(99) 99999-9999"
+                   title="Formato esperado: (99) 99999-9999">
             
             <label>Horário de Trabalho</label>
+            <div style="display:flex; justify-content:space-between; gap: 15px;">
+                <div>
+                    <label for="manhaInicio">Manhã Início</label>
+                    <input type="time" id="manhaInicio" th:field="*{turnoManhaInicioString}" required>
+                </div>
+                <div>
+                    <label for="manhaFim">Manhã Fim</label>
+                    <input type="time" id="manhaFim" th:field="*{turnoManhaFimString}" required>
+                </div>
+            </div>
 
-			<div style="display:flex; justify-content:space-between; gap: 15px;">
-    			<div>
-        			<label for="manhaInicio">Manhã Início</label>
-        			<input type="time" id="manhaInicio" name="turnoManhaInicioString" th:field="*{turnoManhaInicioString}" required>
-    			</div>
-    		<div>
-        		<label for="manhaFim">Manhã Fim</label>
-        		<input type="time" id="manhaFim" name="turnoManhaFimString" th:field="*{turnoManhaFimString}" required>
-    		</div>
-			</div>
-
-			<div style="display:flex; justify-content:space-between; gap: 15px; margin-top: 10px;">
-    			<div>
-        			<label for="tardeInicio">Tarde Início</label>
-        			<input type="time" id="tardeInicio" name="turnoTardeInicioString" th:field="*{turnoTardeInicioString}" required>
-    			</div>
-    			<div>
-        			<label for="tardeFim">Tarde Fim</label>
-        			<input type="time" id="tardeFim" name="turnoTardeFimString" th:field="*{turnoTardeFimString}" required>
-    			</div>
-			</div>
-
+            <div style="display:flex; justify-content:space-between; gap: 15px; margin-top: 10px;">
+                <div>
+                    <label for="tardeInicio">Tarde Início</label>
+                    <input type="time" id="tardeInicio" th:field="*{turnoTardeInicioString}" required>
+                </div>
+                <div>
+                    <label for="tardeFim">Tarde Fim</label>
+                    <input type="time" id="tardeFim" th:field="*{turnoTardeFimString}" required>
+                </div>
+            </div>
+            
             <div style="display:flex; justify-content:space-between; margin-top: 20px;">
                 <button type="button" onclick="document.getElementById('modalAdicionarMecanico').style.display='none'">Cancelar</button>
                 <button type="submit" class="btn-finalizar">Finalizar</button>
@@ -197,9 +204,86 @@
     </div>
 </div>
 
+<div id="modalEditarMecanico" class="modal-custom" style="display:none;">
+    <div class="modal-content-custom">
+        <span class="close-btn" onclick="document.getElementById('modalEditarMecanico').style.display='none'">&times;</span>
+        <h3 class="titulo-centro">Alterar informações do mecânico</h3>
+
+        <form id="formEditarMecanico" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="id" id="editId">
+    		<input type="hidden" name="oficinaId" th:value="${oficina.id}">
+    
+    		<input type="file" id="editFotoMecanico" name="fotoPerfil" accept="image/*">
+
+			<div style="text-align: center; margin-bottom: 20px;">
+        		<label for="editFotoMecanico" style="cursor: pointer; display: inline-block;">
+		    <img id="previewFotoEditar"
+		         th:src="${mecanico != null and mecanico.nomeArquivoFoto != null and mecanico.nomeArquivoFoto != ''}
+		                 ? @{|/uploads/${mecanico.nomeArquivoFoto}|}
+		                 : @{/images/Perfil.png}"
+		         style="width: 80px; height: 80px; border-radius: 50%; border: 0; object-fit: cover;"
+		         alt="Foto do mecânico">
+		    <p style="margin-top: 8px;">Trocar foto</p>
+		  </label>
+        		<input type="file" id="editFotoMecanico" name="fotoPerfil" accept="image/*" style="display:none;">
+    		</div>
+    
+            <label for="editNome">Nome completo</label>
+            <input type="text" id="editNome" name="nomeCompleto" required>
+
+            <label for="editEmail">Email</label>
+            <input type="email" id="editEmail" name="email" required>
+
+            <label for="editSenha">Senha</label>
+            <input type="password" id="editSenha" name="senha" required minlength="3">
+
+            <label for="editTelefone">N° Telefone</label>
+            <input type="tel" id="editTelefone" name="numeroTelefone" required
+                   pattern="\(\d{2}\)\s\d{4,5}-\d{4}" placeholder="(99) 99999-9999">
+
+            <label>Horário de Trabalho</label>
+            <div style="display:flex; gap: 15px; ">
+                <div>
+                    <label for="editManhaInicio">Manhã Início</label>
+                    <input type="time" id="editManhaInicio" name="turnoManhaInicioString" required>
+                </div>
+                <div>
+                    <label for="editManhaFim">Manhã Fim</label>
+                    <input type="time" id="editManhaFim" name="turnoManhaFimString" required>
+                </div>
+            </div>
+
+            <div style="display:flex; gap: 15px; margin-top: 10px;">
+                <div>
+                    <label for="editTardeInicio">Tarde Início</label>
+                    <input type="time" id="editTardeInicio" name="turnoTardeInicioString" required>
+                </div>
+                <div>
+                    <label for="editTardeFim">Tarde Fim</label>
+                    <input type="time" id="editTardeFim" name="turnoTardeFimString" required>
+                </div>
+            </div>
+            
+            <input type="hidden" name="oficinaId" th:value="${oficina.id}">
+            
+
+            <div style="display:flex; justify-content:space-between; margin-top: 20px;">
+                <button type="button" onclick="document.getElementById('modalEditarMecanico').style.display='none'">Cancelar</button>
+                <button type="submit" class="btn-finalizar">Finalizar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div th:if="${param.logout}" class="alert alert-success">
+    Você saiu com sucesso.
+</div>
+
+
 <footer th:replace="~{fragments/footer :: rodape}"></footer>
 
+<!-- JS da página -->
 <script th:src="@{/js/oficina-home.js}"></script>
-
+<script th:src="@{/js/remover-mecanico.js}"></script>
 </body>
 </html>

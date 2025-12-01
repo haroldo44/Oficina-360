@@ -16,7 +16,7 @@ public class MecanicoCadastroDTO {
     @NotBlank(message = "O email é obrigatório")
     private String email;
 
-    @Size(min = 6, message = "A senha deve ter no mínimo 6 caracteres")
+    @Size(min = 3, message = "A senha deve ter no mínimo 6 caracteres")
     @NotBlank(message = "A senha é obrigatória")
     private String senha;
 
@@ -37,6 +37,8 @@ public class MecanicoCadastroDTO {
 
     @NotBlank(message = "O fim da tarde é obrigatório")
     private String turnoTardeFimString;
+    
+    private Long oficinaId;
 
 	public MultipartFile getFotoArquivo() {
 		return fotoArquivo;
@@ -116,5 +118,13 @@ public class MecanicoCadastroDTO {
 
 	public void setTurnoTardeFimString(String turnoTardeFimString) {
 		this.turnoTardeFimString = turnoTardeFimString;
+	}
+
+	public Long getOficinaId() {
+		return oficinaId;
+	}
+
+	public void setOficinaId(Long oficinaId) {
+		this.oficinaId = oficinaId;
 	}
 }

@@ -52,7 +52,7 @@
     height: 45px;
     border-radius: 50%;
     object-fit: cover;
-    border: 2px solid #eee;
+    border: 0px solid #eee;
     margin-bottom: 2px;      /* Reduzi um pouco para caber melhor */
 }
 
@@ -80,3 +80,50 @@
 .perfil-container a:hover .perfil-img {
     opacity: 0.8;
 }
+
+.profile-menu {
+    position: relative;
+    display: flex;               /* Flexível */
+    flex-direction: column;     /* Empilha verticalmente */
+    align-items: center;        /* Centraliza tudo */
+    cursor: pointer;
+    min-width: 100px;
+    height: 100%;
+    padding: 0 10px;
+}
+
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    top: 100%;                  /* Aparece abaixo do menu */
+    right: 0;
+    background-color: #fff;
+    min-width: 120px;
+    box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
+    z-index: 1;
+    border-radius: 6px;
+}
+
+
+.dropdown-content a {
+    color: black;
+    padding: 10px;
+    text-decoration: none;
+    display: block;
+}
+
+.dropdown-content a:hover {
+    background-color: #f1f1f1;
+}
+
+/* Mostrar dropdown ao passar o mouse */
+.profile-menu:hover .dropdown-content {
+    display: block;
+}
+
+.profile-menu:hover .dropdown-content {
+    display: block;
+}
+
+

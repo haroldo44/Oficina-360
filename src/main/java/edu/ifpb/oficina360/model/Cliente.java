@@ -27,12 +27,10 @@ public class Cliente {
     private Long id;
 
     // ========= ETAPA 1 ==========
-    @NotBlank(message = "O e-mail é obrigatório")
-    @Email(message = "E-mail inválido")
+
     @Column(unique = true)
     private String email;
 
-    @NotBlank(message = "A senha é obrigatória")
     @Column
     private String senha;
 
@@ -40,11 +38,9 @@ public class Cliente {
     private String confirmarSenha;
 
     // ========= ETAPA 2 ==========
-    @NotBlank(message = "O nome é obrigatório")
     @Column
     private String nome;
 
-    @NotBlank(message = "O CPF é obrigatório")
     @Column(unique = true)
     private String cpf;
 

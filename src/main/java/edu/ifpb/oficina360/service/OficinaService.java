@@ -18,7 +18,8 @@ public class OficinaService {
 
     @Autowired
     private OficinaRepository oficinaRepository;
-
+    
+    
     // Agora a pasta é EXTERNA ao projeto
     private final String uploadDir = "uploads/";
 
@@ -137,4 +138,20 @@ public class OficinaService {
     public void excluir(Long id) {
         oficinaRepository.deleteById(id);
     }
+    
+    // Autenticar login
+    public boolean autenticar(String email, String senhaDigitada) {
+        Oficina oficina = oficinaRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Oficina não encontrada"));
+
+        // Comparação direta (sem hash)
+        return oficina.getSenha().equals(senhaDigitada);
+    }
+    
+    public Oficina buscarPorEmail(String email) {
+        return oficinaRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Oficina não encontrada com email: " + email));
+    }
+
+
 }

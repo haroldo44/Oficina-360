@@ -5,48 +5,48 @@
 <header th:fragment="cabecalho" class="header-custom">
     <link rel="stylesheet" th:href="@{/css/header.css}">
 
-    <!-- LOGO → volta para home da oficina SE existir oficina -->
-    <div class="logo-area">
-
-        <!-- Se existir oficina, vai para a home da oficina -->
-        <a th:if="${oficina != null}" th:href="@{/oficinas/home/{id}(id=${oficina.id})}">
+    <!-- LOGO: um único <a>, escolhendo o destino com prioridade para cliente -->
+    <div class="logo-area"
+         th:with="homeUrl=${cliente != null} ? @{/clientes/home/{id}(id=${cliente.id})}
+                 : (${oficina != null} ? @{/oficinas/home/{id}(id=${oficina.id})} : @{/})">
+        <a th:href="${homeUrl}">
             <img th:src="@{/images/logo-da-oficina.png}" alt="Oficina 360" class="logo-img">
         </a>
-
-        <!-- Se NÃO existir oficina, volta para página inicial (ou login) -->
-        <a th:if="${oficina == null}" th:href="@{/}">
-            <img th:src="@{/images/logo-da-oficina.png}" alt="Oficina 360" class="logo-img">
-        </a>
-
     </div>
 
+    <!-- PERFIL DO CLIENTE -->
+    <div class="perfil-container" th:if="${cliente != null}">
+        <div class="profile-menu">
+            <img class="perfil-img" th:src="@{/images/Perfil.png}" alt="Foto do Cliente">
+            <span th:text="${cliente.nome}">Nome do Cliente</span>
+            <div class="dropdown-content">
+                <a th:href="@{/clientes/perfil/{id}(id=${cliente.id})}">Perfil</a>
+                <a th:href="@{/logout}">Sair</a>
+            </div>
+        </div>
+    </div>
 
-    <!-- ========================= PERFIL DO USUÁRIO ========================= -->
-    <!-- Mostra perfil SOMENTE quando oficina existe -->
-    <div class="perfil-container" th:if="${oficina != null}">
-
-        <a th:href="@{/oficinas/perfil/{id}(id=${oficina.id})}" class="perfil-link">
-
-            <!-- FOTO DO PROPRIETÁRIO -->
+    <!-- PERFIL DO MECÂNICO / OFICINA -->
+    <div class="perfil-container" th:if="${cliente == null and oficina != null}">
+        <div class="profile-menu">
             <img class="perfil-img"
                  th:if="${oficina.fotoProprietario != null}"
                  th:src="@{'/uploads/' + ${oficina.fotoProprietario}}"
-                 alt="Foto">
-
+                 alt="Foto do Proprietário">
             <img class="perfil-img"
                  th:if="${oficina.fotoProprietario == null}"
-                 th:src="@{/images/perfil-default.png}"
+                 th:src="@{/images/Perfil.png}"
                  alt="Sem foto">
-
-            <span th:text="${oficina.nomeDoProprietario}">Nome</span>
-
-        </a>
-
+            <span th:text="${oficina.nomeDoProprietario}">Nome do Proprietário</span>
+            <div class="dropdown-content">
+                <a th:href="@{/oficinas/perfil/{id}(id=${oficina.id})}">Perfil</a>
+                <a th:href="@{/logout}">Sair</a>
+            </div>
+        </div>
     </div>
 
-
-    <!-- ========================= QUANDO NÃO TEM OFICINA ========================= -->
-    <div class="perfil-container" th:if="${oficina == null}">
+    <!-- QUANDO NINGUÉM ESTÁ LOGADO -->
+    <div class="perfil-container" th:if="${cliente == null and oficina == null}">
         <a th:href="@{/login}" class="perfil-link">
             <img class="perfil-img" th:src="@{/images/perfil-default.png}" alt="Perfil">
             <span>Entrar</span>
