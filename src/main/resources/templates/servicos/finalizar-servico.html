@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finalizar Serviço - Oficina 360</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>body { font-family: 'Inter', sans-serif; background-color: #ffffff; }</style>
+</head>
+<body>
+	
+	<header th:replace="~{fragments/header :: cabecalho}"></header>
+	
+    <div class="max-w-4xl mx-auto bg-white shadow-md p-8 border border-gray-200">
+        
+        <h1 class="text-center text-xl font-medium mb-8">Preencha as informações abaixo</h1>
+
+        <!-- CABEÇALHO DO DOCUMENTO ATUALIZADO COM LOGO -->
+        <div class="flex justify-between items-center mb-8 border-b pb-4">
+            <!-- Logo na Esquerda -->
+            <img th:src="@{/images/logo-da-oficina.png}" alt="Oficina 360" class="h-16 w-auto object-contain">
+            
+            <!-- Título Centralizado -->
+            <div class="text-sm font-semibold uppercase tracking-wide">ORDEM DE SERVIÇO REALIZADO</div>
+            
+            <!-- Logo na Direita -->
+            <img th:src="@{/images/logo-da-oficina.png}" alt="Oficina 360" class="h-16 w-auto object-contain">
+        </div>
+
+        <form th:action="@{/mecanicos/concluir/{id}(id=${servico.id})}" method="post" th:object="${servico}">
+            
+            <!-- CLIENTE (Leitura) -->
+            <div class="bg-gray-600 text-white px-4 py-2 font-medium text-sm">Cliente</div>
+            <div class="grid grid-cols-2 border border-t-0 border-gray-300 text-sm mb-6">
+                <div class="p-3 border-r border-gray-300">
+                    <span class="font-bold block">Nome</span>
+                    <span th:text="${servico.cliente.nome}">Nome do Cliente</span>
+                </div>
+                <div class="p-3">
+                    <span class="font-bold block">Endereço</span>
+                    <!-- Endereço composto do Cliente -->
+                    <span th:text="|${servico.cliente.rua}, ${servico.cliente.bairro} - ${servico.cliente.cidade}|">Endereço</span>
+                </div>
+                <div class="p-3 border-r border-gray-300 border-t">
+                    <span class="font-bold block">Telefone</span>
+                    <!-- CORREÇÃO: Usando 'contato' e adicionando fallback se estiver vazio -->
+                    <span th:text="${servico.cliente.contato} ?: 'Não informado'">Telefone</span>
+                </div>
+                <div class="p-3 border-t border-gray-300">
+                    <span class="font-bold block">CPF</span>
+                    <span th:text="${servico.cliente.cpf}">CPF</span>
+                </div>
+            </div>
+
+            <!-- VEÍCULO (Preenchimento Manual) -->
+            <div class="bg-gray-600 text-white px-4 py-2 font-medium text-sm">Veículo</div>
+            <div class="grid grid-cols-2 border border-t-0 border-gray-300 text-sm mb-6">
+                <div class="p-3 border-r border-gray-300">
+                    <label class="font-bold block mb-1">Veículo (Modelo/Ano)</label>
+                    <input type="text" name="veiculoModelo" class="w-full border border-gray-300 p-1 rounded" placeholder="Ex: Chevrolet Onix LTZ (2018/2019)" required>
+                </div>
+                <div class="p-3">
+                    <label class="font-bold block mb-1">Placa</label>
+                    <input type="text" name="veiculoPlaca" class="w-full border border-gray-300 p-1 rounded" placeholder="Ex: ABC-4D21" required>
+                </div>
+                <div class="p-3 border-r border-gray-300 border-t">
+                    <label class="font-bold block mb-1">Marca</label>
+                    <input type="text" name="veiculoMarca" class="w-full border border-gray-300 p-1 rounded" placeholder="Ex: Chevrolet" required>
+                </div>
+                <div class="p-3 border-t border-gray-300">
+                    <label class="font-bold block mb-1">Nº Chassi</label>
+                    <input type="text" name="veiculoChassi" class="w-full border border-gray-300 p-1 rounded" placeholder="Opcional">
+                </div>
+            </div>
+
+            <!-- DESCRIÇÃO DO CLIENTE (Leitura) -->
+            <div class="bg-gray-600 text-white px-4 py-2 font-medium text-sm">Informação descrita por cliente</div>
+            <div class="border border-t-0 border-gray-300 p-4 text-sm mb-6 text-gray-700" th:text="${servico.descricao}">
+                Descrição do problema relatado pelo cliente...
+            </div>
+
+            <!-- DIAGNÓSTICO (Manual) -->
+            <div class="bg-gray-600 text-white px-4 py-2 font-medium text-sm">Diagnóstico do mecânico</div>
+            <div class="border border-t-0 border-gray-300 p-0 mb-6">
+                <textarea name="diagnosticoMecanico" class="w-full h-32 p-4 text-sm outline-none resize-none" placeholder="Descreva a causa raiz e constatações..." required></textarea>
+            </div>
+
+            <!-- SOLUÇÃO (Manual) -->
+            <div class="bg-gray-600 text-white px-4 py-2 font-medium text-sm">Solução</div>
+            <div class="border border-t-0 border-gray-300 p-0 mb-6">
+                <textarea name="solucaoAplicada" class="w-full h-20 p-4 text-sm outline-none resize-none" placeholder="Descreva o que foi feito..." required></textarea>
+            </div>
+
+            <!-- PEÇAS/ITENS (Manual Simplificado) -->
+            <div class="bg-gray-600 text-white px-4 py-2 font-medium text-sm">Itens e Peças</div>
+            <div class="border border-t-0 border-gray-300 p-4 text-sm mb-6">
+                <div class="mb-2">
+                    <label class="font-bold block">Descrição das Peças / Material</label>
+                    <textarea name="pecasTrocadas" class="w-full border border-gray-300 p-2 rounded h-20" placeholder="Ex: Óleo 5W30 (4 un), Filtro de Óleo (1 un)..."></textarea>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="font-bold block">Valor Total das Peças (R$)</label>
+                        <input type="number" step="0.01" id="valorPecas" name="valorPecas" class="w-full border border-gray-300 p-2 rounded" value="0" oninput="calcularTotal()">
+                    </div>
+                </div>
+            </div>
+
+            <!-- MÃO DE OBRA (Manual) -->
+            <div class="bg-gray-600 text-white px-4 py-2 font-medium text-sm">Mão de obra</div>
+            <div class="grid grid-cols-2 border border-t-0 border-gray-300 text-sm mb-6">
+                <div class="p-3 border-r border-gray-300">
+                    <span class="font-bold block">Mecânico</span>
+                    <!-- Ajustado para usar nomeCompleto conforme a classe Mecanico -->
+                    <span th:text="${servico.mecanico.nomeCompleto}">Nome do Mecânico</span>
+                </div>
+                <div class="p-3">
+                    <label class="font-bold block">Valor Mão de Obra (R$)</label>
+                    <input type="number" step="0.01" id="valorMaoDeObra" name="valorMaoDeObra" class="w-full border border-gray-300 p-1 rounded" value="0" oninput="calcularTotal()" required>
+                </div>
+            </div>
+
+            <!-- INFORMAÇÕES FINAIS (Auto + Calculado) -->
+            <div class="bg-gray-600 text-white px-4 py-2 font-medium text-sm">Informações finais do serviço</div>
+            <div class="border border-t-0 border-gray-300 p-4 text-sm mb-8 bg-gray-50">
+                <div class="grid grid-cols-2 gap-y-2">
+                    <div><span class="font-bold">Oficina:</span> <span th:text="${servico.oficina.nomeDaOficina}">Nome da Oficina</span></div>
+                    
+                    <!-- CORREÇÃO: Usando 'telefoneDoProprietario' pois Oficina não tem campo 'telefone' -->
+                    <div><span class="font-bold">Contato:</span> <span th:text="${servico.oficina.telefoneDoProprietario} ?: 'Não informado'">Tel Oficina</span></div>
+                    
+                    <div><span class="font-bold">CNPJ:</span> <span th:text="${servico.oficina.cnpj}">CNPJ</span></div>
+                    <div><span class="font-bold">Data agendamento:</span> <span th:text="${#temporals.format(servico.dataAgendamento, 'dd/MM/yyyy')}">Data</span></div>
+                    
+                    <!-- CORREÇÃO: Construindo endereço com rua, bairro e cidade (Oficina não tem 'endereco') -->
+                    <div><span class="font-bold">Endereço:</span> <span th:text="|${servico.oficina.rua}, ${servico.oficina.bairro} - ${servico.oficina.cidade}|">Endereço Oficina</span></div>
+                    <div><span class="font-bold">Data finalização:</span> <span id="dataHoje">Hoje</span></div>
+                    
+                    <div><span class="font-bold">Protocolo:</span> <span th:text="${servico.id}">ID</span></div>
+                    <div class="text-lg mt-2"><span class="font-bold">Total do serviço: R$ </span> <span id="displayTotal" class="font-bold">0.00</span></div>
+                </div>
+            </div>
+
+            <!-- BOTÕES -->
+            <div class="flex justify-between items-center mt-8">
+                <!-- Cancelar volta para a home -->
+                <a th:href="@{/mecanicos/home/{id}(id=${servico.mecanico.id})}" class="bg-red-600 text-white px-8 py-3 rounded font-bold hover:bg-red-700 transition">
+                    Cancelar
+                </a>
+                
+                <!-- Enviar Comprovante submete o formulário -->
+                <button type="submit" class="bg-gray-800 text-white px-8 py-3 rounded font-bold hover:bg-black transition">
+                    Enviar comprovante
+                </button>
+            </div>
+
+        </form>
+    </div>
+
+	    <div id="footer-wrapper" class="w-full mt-10 border-t border-gray-200 pt-6 flex flex-col items-center justify-center text-center">
+        <div class="w-full max-w-[1600px] flex flex-col items-center">
+            <footer th:replace="~{fragments/footer :: rodape}"></footer>
+        </div>
+    </div>
+
+    <script>
+        // Preenche data de hoje
+        const today = new Date();
+        document.getElementById('dataHoje').innerText = today.toLocaleDateString('pt-BR');
+
+        function calcularTotal() {
+            const pecas = parseFloat(document.getElementById('valorPecas').value) || 0;
+            const maoObra = parseFloat(document.getElementById('valorMaoDeObra').value) || 0;
+            const total = pecas + maoObra;
+            document.getElementById('displayTotal').innerText = total.toFixed(2);
+        }
+    </script>
+
+</body>
+</html>

@@ -3,22 +3,36 @@
 <body>
 
 <header th:fragment="cabecalho" class="header-custom">
+    <!-- Garante que o CSS do header seja carregado -->
     <link rel="stylesheet" th:href="@{/css/header.css}">
 
-    <!-- LOGO: um único <a>, escolhendo o destino com prioridade para cliente -->
+    <!-- LOGO: Lógica de redirecionamento baseada no usuário logado -->
     <div class="logo-area"
          th:with="homeUrl=${cliente != null} ? @{/clientes/home/{id}(id=${cliente.id})}
-                 : (${oficina != null} ? @{/oficinas/home/{id}(id=${oficina.id})} : @{/})">
+                 : (${mecanico != null} ? @{/mecanicos/home/{id}(id=${mecanico.id})} 
+                 : (${oficina != null and cliente == null} ? @{/oficinas/home/{id}(id=${oficina.id})} : @{/}))">
         <a th:href="${homeUrl}">
+            <!-- Substitua pelo caminho correto da sua logo -->
             <img th:src="@{/images/logo-da-oficina.png}" alt="Oficina 360" class="logo-img">
         </a>
     </div>
 
-    <!-- PERFIL DO CLIENTE -->
+    <!-- ==================== PERFIL DO CLIENTE ==================== -->
+    <!-- Prioridade Máxima: Se cliente existe, mostra ele -->
     <div class="perfil-container" th:if="${cliente != null}">
         <div class="profile-menu">
-            <img class="perfil-img" th:src="@{/images/Perfil.png}" alt="Foto do Cliente">
+            
+            <img class="perfil-img"
+                 th:if="${cliente.foto != null}"
+                 th:src="@{'/uploads/' + ${cliente.foto}}"
+                 alt="Foto do Cliente">
+            <img class="perfil-img"
+                 th:if="${cliente.foto == null}"
+                 th:src="@{/images/Perfil.png}"
+                 alt="Sem foto">
+
             <span th:text="${cliente.nome}">Nome do Cliente</span>
+            
             <div class="dropdown-content">
                 <a th:href="@{/clientes/perfil/{id}(id=${cliente.id})}">Perfil</a>
                 <a th:href="@{/logout}">Sair</a>
@@ -26,8 +40,9 @@
         </div>
     </div>
 
-    <!-- PERFIL DO MECÂNICO / OFICINA -->
-    <div class="perfil-container" th:if="${cliente == null and oficina != null}">
+    <!-- ==================== PERFIL DA OFICINA ==================== -->
+    <!-- Correção: Só mostra oficina se NÃO for cliente E NÃO for mecânico -->
+    <div class="perfil-container" th:if="${oficina != null and cliente == null and mecanico == null}">
         <div class="profile-menu">
             <img class="perfil-img"
                  th:if="${oficina.fotoProprietario != null}"
@@ -37,7 +52,9 @@
                  th:if="${oficina.fotoProprietario == null}"
                  th:src="@{/images/Perfil.png}"
                  alt="Sem foto">
+                 
             <span th:text="${oficina.nomeDoProprietario}">Nome do Proprietário</span>
+            
             <div class="dropdown-content">
                 <a th:href="@{/oficinas/perfil/{id}(id=${oficina.id})}">Perfil</a>
                 <a th:href="@{/logout}">Sair</a>
@@ -45,8 +62,34 @@
         </div>
     </div>
 
-    <!-- QUANDO NINGUÉM ESTÁ LOGADO -->
-    <div class="perfil-container" th:if="${cliente == null and oficina == null}">
+    <!-- ==================== PERFIL DO MECÂNICO ==================== -->
+    <!-- Correção: Só mostra mecânico se NÃO for cliente (Prioridade sobre oficina é contextual, mas garantimos que cliente anula) -->
+    <div class="perfil-container" th:if="${mecanico != null and cliente == null}">
+        <div class="profile-menu">
+            
+            <!-- Usando 'nomeArquivoFoto' conforme sua classe Mecanico.java -->
+            <img class="perfil-img"
+                 th:if="${mecanico.nomeArquivoFoto != null}"
+                 th:src="@{'/uploads/' + ${mecanico.nomeArquivoFoto}}"
+                 alt="Foto do Mecânico">
+            <img class="perfil-img"
+                 th:if="${mecanico.nomeArquivoFoto == null}"
+                 th:src="@{/images/Perfil.png}"
+                 alt="Sem foto">
+
+            <!-- Usando 'nomeCompleto' conforme sua classe Mecanico.java -->
+            <span th:text="${mecanico.nomeCompleto}">Nome do Mecânico</span>
+            
+            <div class="dropdown-content">
+                <!-- Mecânico só tem opção de Sair -->
+                <a th:href="@{/logout}">Sair</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== QUANDO NINGUÉM ESTÁ LOGADO ==================== -->
+    <!-- Botão de entrar só aparece se não houver nenhum dos 3 usuários na sessão/model -->
+    <div class="perfil-container" th:if="${cliente == null and oficina == null and mecanico == null}">
         <a th:href="@{/login}" class="perfil-link">
             <img class="perfil-img" th:src="@{/images/perfil-default.png}" alt="Perfil">
             <span>Entrar</span>

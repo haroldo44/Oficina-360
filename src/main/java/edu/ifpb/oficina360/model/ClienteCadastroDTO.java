@@ -5,26 +5,24 @@ import jakarta.validation.constraints.NotBlank;
 
 public class ClienteCadastroDTO {
 
-	@Email(message = "E-mail inválido")
-	@NotBlank(message = "O e-mail é obrigatório")
-	private String email;
+    @Email(message = "E-mail inválido")
+    @NotBlank(message = "O e-mail é obrigatório")
+    private String email;
 
-	@NotBlank(message = "A senha é obrigatória")
-	private String senha;
+    @NotBlank(message = "A senha é obrigatória")
+    private String senha;
 
-	@NotBlank(message = "Confirmação de senha é obrigatória")
-	private String confirmarSenha;
+    @NotBlank(message = "Confirmação de senha é obrigatória")
+    private String confirmarSenha;
 
-	// Remover NotBlank aqui
-	private String nome;
-
-	// Remover NotBlank aqui
-	private String cpf;
-
-	private String cidade;
-	private String bairro;
-	private String rua;
-	private Long oficinaId;
+    private String nome;
+    private String cpf;
+    private String contato;
+    private String cidade;
+    private String bairro;
+    private String rua;
+    private Long oficinaId;
+    
     
 	public String getEmail() {
 		return email;
@@ -56,6 +54,12 @@ public class ClienteCadastroDTO {
 	public void setCpf(String cpf) {
 		this.cpf = cpf;
 	}
+	public String getContato() {
+		return contato;
+	}
+	public void setContato(String contato) {
+		this.contato = contato;
+	}
 	public String getCidade() {
 		return cidade;
 	}
@@ -79,5 +83,5 @@ public class ClienteCadastroDTO {
 	}
 	public void setOficinaId(Long oficinaId) {
 		this.oficinaId = oficinaId;
-	}
+	} 
 }

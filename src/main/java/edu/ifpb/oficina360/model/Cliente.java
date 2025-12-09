@@ -3,6 +3,8 @@ package edu.ifpb.oficina360.model;
 import java.util.List;
 import java.util.Objects;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -14,8 +16,6 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 
 @Entity
 @Table(name = "clientes")
@@ -23,21 +23,24 @@ public class Cliente {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="cliente_seq")
-    @SequenceGenerator(name="cliente_seq", sequenceName="cliente_seq",allocationSize=1)
+    @SequenceGenerator(name="cliente_seq", sequenceName="cliente_seq", allocationSize=1)
     private Long id;
 
-    // ========= ETAPA 1 ==========
-
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String email;
 
-    @Column
+    @Column(nullable = false)
     private String senha;
 
-    @Column
+    @Transient
     private String confirmarSenha;
 
-    // ========= ETAPA 2 ==========
+    @Column
+    private String foto;
+    
+    @Transient
+    private MultipartFile fotoPerfilArquivo;
+
     @Column
     private String nome;
 
@@ -45,25 +48,26 @@ public class Cliente {
     private String cpf;
 
     @Column
+    private String contato;
+
+    @Column
     private String cidade;
-    
+
     @Column
     private String bairro;
-    
+
     @Column
     private String rua;
 
-    // ========= ETAPA 3 ==========
     @ManyToOne
     @JoinColumn(name = "oficina_id")
     private Oficina oficina;
 
-    // Serviços
     @OneToMany(mappedBy = "cliente")
     private List<Servico> servicos;
 
-    // Gets e sets
-	public Long getId() {
+
+    public Long getId() {
 		return id;
 	}
 
@@ -95,6 +99,22 @@ public class Cliente {
 		this.confirmarSenha = confirmarSenha;
 	}
 
+	public String getFoto() {
+		return foto;
+	}
+
+	public void setFoto(String foto) {
+		this.foto = foto;
+	}
+	
+	public MultipartFile getFotoPerfilArquivo() {
+		return fotoPerfilArquivo;
+	}
+
+	public void setFotoPerfilArquivo(MultipartFile fotoPerfilArquivo) {
+		this.fotoPerfilArquivo = fotoPerfilArquivo;
+	}
+
 	public String getNome() {
 		return nome;
 	}
@@ -109,6 +129,14 @@ public class Cliente {
 
 	public void setCpf(String cpf) {
 		this.cpf = cpf;
+	}
+
+	public String getContato() {
+		return contato;
+	}
+
+	public void setContato(String contato) {
+		this.contato = contato;
 	}
 
 	public String getCidade() {
@@ -152,23 +180,15 @@ public class Cliente {
 	}
 
 	@Override
-	public int hashCode() {
-		return Objects.hash(bairro, cidade, confirmarSenha, cpf, email, id, nome, oficina, rua, senha);
-	}
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Cliente other = (Cliente) obj;
-		return Objects.equals(bairro, other.bairro) && Objects.equals(cidade, other.cidade)
-				&& Objects.equals(confirmarSenha, other.confirmarSenha) && Objects.equals(cpf, other.cpf)
-				&& Objects.equals(email, other.email) && Objects.equals(id, other.id)
-				&& Objects.equals(nome, other.nome) && Objects.equals(oficina, other.oficina)
-				&& Objects.equals(rua, other.rua) && Objects.equals(senha, other.senha);
-	}
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Cliente other = (Cliente) obj;
+        return Objects.equals(id, other.id);
+    }
 }

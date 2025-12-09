@@ -1,35 +1,38 @@
 package edu.ifpb.oficina360.model;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Objects;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.SequenceGenerator;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "servicos")
 public class Servico {
 
-	@Id
+    @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="servico_seq")
-    @SequenceGenerator(name="servico_seq", sequenceName="servico_seq",allocationSize=1)
+    @SequenceGenerator(name="servico_seq", sequenceName="servico_seq", allocationSize=1)
     private Long id;
 
-	@Column
+    @Column
     private String titulo;
 
-	@Column(name = "descricao", columnDefinition = "CLOB") // Força o uso do CLOB no Oracle
-	private String descricao;
+    // CORREÇÃO AQUI: Mudado de "TEXT" para "CLOB" para funcionar no Oracle
+    @Column(name = "descricao", columnDefinition = "CLOB") 
+    private String descricao;
 
     @Column
-    private String status;  
-    // valores: "PENDENTE" ou "FINALIZADO"
+    private String status; // PENDENTE, FINALIZADO
+
+    @Column(name = "data_agendamento")
+    private LocalDate dataAgendamento;
+    
+    @Column(name = "data_finalizacao")
+    private LocalDate dataFinalizacao;
+
+    @Column(name = "hora_agendamento")
+    private LocalTime horaAgendamento;
 
     @ManyToOne
     @JoinColumn(name = "cliente_id")
@@ -39,7 +42,11 @@ public class Servico {
     @JoinColumn(name = "oficina_id")
     private Oficina oficina;
 
-	public Long getId() {
+    @ManyToOne
+    @JoinColumn(name = "mecanico_id")
+    private Mecanico mecanico;
+
+    public Long getId() {
 		return id;
 	}
 
@@ -71,6 +78,30 @@ public class Servico {
 		this.status = status;
 	}
 
+	public LocalDate getDataAgendamento() {
+		return dataAgendamento;
+	}
+
+	public void setDataAgendamento(LocalDate dataAgendamento) {
+		this.dataAgendamento = dataAgendamento;
+	}
+
+	public LocalDate getDataFinalizacao() {
+		return dataFinalizacao;
+	}
+
+	public void setDataFinalizacao(LocalDate dataFinalizacao) {
+		this.dataFinalizacao = dataFinalizacao;
+	}
+
+	public LocalTime getHoraAgendamento() {
+		return horaAgendamento;
+	}
+
+	public void setHoraAgendamento(LocalTime horaAgendamento) {
+		this.horaAgendamento = horaAgendamento;
+	}
+
 	public Cliente getCliente() {
 		return cliente;
 	}
@@ -87,23 +118,24 @@ public class Servico {
 		this.oficina = oficina;
 	}
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(cliente, descricao, id, oficina, status, titulo);
+	public Mecanico getMecanico() {
+		return mecanico;
+	}
+
+	public void setMecanico(Mecanico mecanico) {
+		this.mecanico = mecanico;
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Servico other = (Servico) obj;
-		return Objects.equals(cliente, other.cliente) && Objects.equals(descricao, other.descricao)
-				&& Objects.equals(id, other.id) && Objects.equals(oficina, other.oficina)
-				&& Objects.equals(status, other.status) && Objects.equals(titulo, other.titulo);
-	}
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Servico other = (Servico) obj;
+        return Objects.equals(id, other.id);
+    }
 }
-

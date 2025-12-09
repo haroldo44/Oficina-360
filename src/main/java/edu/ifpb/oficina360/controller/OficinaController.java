@@ -109,16 +109,13 @@ public class OficinaController {
     // ===================== HOME (ATUALIZADO) =====================
     @GetMapping("/home/{id}")
     public String home(@PathVariable Long id, Model model) {
-        // CORREÇÃO: Remova o .orElseThrow(), pois o serviço já resolve o Optional
         Oficina oficina = oficinaService.buscarPorId(id); 
-                // .orElseThrow(() -> new RuntimeException("Oficina não encontrada")); <--- REMOVIDO!
         
-        // NOVO: Carregar a lista de mecânicos desta oficina
         java.util.List<Mecanico> mecanicos = mecanicoService.buscarMecanicosPorOficina(id);
         
         model.addAttribute("oficina", oficina);
-        model.addAttribute("mecanicos", mecanicos); // ENVIAR PARA O HTML
-        model.addAttribute("mecanicoDto", new MecanicoCadastroDTO()); // NOVO: Objeto vazio para a modal de cadastro
+        model.addAttribute("mecanicos", mecanicos); 
+        model.addAttribute("mecanicoDto", new MecanicoCadastroDTO()); 
         
         return "oficinas/oficina-home";
     }
@@ -208,24 +205,24 @@ public class OficinaController {
     }
     
     // Login
-    @PostMapping("/login")
-    public String login(@RequestParam String email,
-                        @RequestParam String senha,
-                        HttpSession session,
-                        RedirectAttributes attr) {
-
-        Oficina oficina = oficinaService.buscarPorEmail(email);
-
-        if (oficina.getSenha().equals(senha)) {
-            // guarda o usuário logado na sessão
-            session.setAttribute("usuarioLogado", oficina);
-
-            // redireciona para a tela inicial da empresa
-            return "redirect:/oficinas/home/" + oficina.getId();
-        } else {
-            attr.addFlashAttribute("erro", "Email ou senha inválidos!");
-            return "redirect:/login"; // volta para tela de login
-        }
-    }
+//    @PostMapping("/login")
+//    public String login(@RequestParam String email,
+//                        @RequestParam String senha,
+//                        HttpSession session,
+//                        RedirectAttributes attr) {
+//
+//        Oficina oficina = oficinaService.buscarPorEmail(email);
+//
+//        if (oficina.getSenha().equals(senha)) {
+//            // guarda o usuário logado na sessão
+//            session.setAttribute("usuarioLogado", oficina);
+//
+//            // redireciona para a tela inicial da empresa
+//            return "redirect:/oficinas/home/" + oficina.getId();
+//        } else {
+//            attr.addFlashAttribute("erro", "Email ou senha inválidos!");
+//            return "redirect:/login"; // volta para tela de login
+//        }
+//    }
 
 }

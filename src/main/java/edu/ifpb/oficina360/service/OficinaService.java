@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -28,7 +29,7 @@ public class OficinaService {
         if (!pasta.exists()) pasta.mkdirs();
     }
 
-    // ✅ CORRIGIDO — Não retorna mais Optional
+    
     public Oficina buscarPorId(Long id) {
         return oficinaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Oficina não encontrada"));
@@ -149,9 +150,12 @@ public class OficinaService {
     }
     
     public Oficina buscarPorEmail(String email) {
-        return oficinaRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Oficina não encontrada com email: " + email));
+        return oficinaRepository.findByEmail(email).orElse(null);
     }
 
+	 // dentro da classe OficinaService
+	 public List<Oficina> buscarTodas() {
+	     return oficinaRepository.findAll();
+	 }
 
 }

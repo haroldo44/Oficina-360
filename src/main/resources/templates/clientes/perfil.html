@@ -3,75 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Perfil do Cliente</title>
-    <link rel="stylesheet" th:href="@{/css/tela-inicial-cliente.css}">
+    <title>Perfil de Usuário</title>
+    <link rel="stylesheet" th:href="@{/css/perfil-cliente.css}">
 </head>
 <body>
 
-<header th:replace="~{fragments/header :: cabecalho}" class="header-custom"></header>
+<header th:replace="~{fragments/header :: cabecalho}"></header>
 
 <main class="container">
 
-    <!-- CARTÃO DE PERFIL -->
-    <section class="profile-card">
-        <!-- FOTO DO CLIENTE -->
-        <div class="profile-photo">
-            <img th:if="${cliente.foto != null}" th:src="@{'/uploads/' + ${cliente.foto}}" alt="Foto do cliente">
-            <img th:if="${cliente.foto == null}" th:src="@{/images/perfil-default.png}" alt="Foto padrão">
+    <div class="profile-header">
+        <span class="profile-title">Perfil de usuário</span>
+    </div>
+
+    <!-- FOTO DO CLIENTE -->
+    <div class="photo-container">
+        <img id="previewFotoCliente"
+             th:src="${cliente.foto != null} ? @{'/uploads/' + ${cliente.foto}} : @{/images/perfil-default.png}"
+             class="avatar-img"
+             alt="Foto do usuário">
+    </div>
+
+    <!-- ALTERAR FOTO -->
+    <button class="btn-change-photo" onclick="document.getElementById('inputFotoCliente').click();">
+        Alterar foto de perfil
+    </button>
+
+    <!-- ENVIO DA NOVA FOTO -->
+    <form th:action="@{/clientes/alterar-foto/{id}(id=${cliente.id})}"
+          method="post"
+          enctype="multipart/form-data">
+        <input type="file"
+               id="inputFotoCliente"
+               name="fotoPerfilArquivo"
+               accept="image/*"
+               style="display:none"
+               onchange="previewAndSubmit(event, this.form)">
+    </form>
+
+    <!-- INFORMAÇÕES -->
+    <div class="info-grid">
+
+        <div class="form-group">
+            <label class="form-label">Nome</label>
+            <div class="info-box" th:text="${cliente.nome}">Nome do Usuário</div>
         </div>
 
-        <!-- INFORMAÇÕES DO CLIENTE -->
-        <div class="profile-info">
-            <h1 th:text="${cliente.nome}">Nome do Cliente</h1>
+        <div class="form-group">
+            <label class="form-label">Cidade</label>
+            <div class="info-box" th:text="${cliente.cidade}">Cidade</div>
+        </div>
 
-            <div class="profile-columns">
-                <div class="profile-col">
-                    <p><strong>CPF:</strong> <span th:text="${cliente.cpf}">000.000.000-00</span></p>
-                    <p><strong>Contato:</strong> <span th:text="${cliente.contato}">(00) 00000-0000</span></p>
-                    <p><strong>Cidade:</strong> <span th:text="${cliente.cidade}">Cidade</span></p>
-                </div>
+        <div class="form-group">
+            <label class="form-label">CPF</label>
+            <div class="info-box" th:text="${cliente.cpf}">000.000.000-00</div>
+        </div>
 
-                <div class="profile-col">
-                    <p><strong>Bairro:</strong> <span th:text="${cliente.bairro}">Bairro</span></p>
-                    <p><strong>Rua:</strong> <span th:text="${cliente.rua}">Rua</span></p>
-                    <p><strong>ID da oficina vinculada:</strong>
-                        <span th:if="${cliente.oficina != null}">
-                            <a th:href="@{/oficinas/home/{id}(id=${cliente.oficina.id})}" 
-                               th:text="${cliente.oficina.id}" 
-                               class="link-oficina"></a>
-                        </span>
-                        <span th:if="${cliente.oficina == null}">—</span>
-                    </p>
-                </div>
+        <div class="form-group">
+            <label class="form-label">Bairro</label>
+            <div class="info-box" th:text="${cliente.bairro}">Bairro</div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Contato</label>
+            <div class="info-box" th:text="${cliente.contato}">(00) 00000-0000</div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Rua</label>
+            <div class="info-box" th:text="${cliente.rua}">Nome da Rua</div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">ID da oficina vinculada</label>
+            <div class="info-box">
+                <span th:if="${cliente.oficina != null}" th:text="${cliente.oficina.id}">123</span>
+                <span th:if="${cliente.oficina == null}">—</span>
             </div>
-
-            <!-- BOTÕES -->
-            <div class="profile-actions">
-                <a th:href="@{/clientes/editar/{id}(id=${cliente.id})}" class="btn btn-black">
-                    Editar perfil
-                </a>
-
-                <form th:action="@{/clientes/excluir/{id}(id=${cliente.id})}" method="post" 
-                      onsubmit="return confirm('Tem certeza que deseja excluir sua conta? Esta ação não pode ser desfeita.');">
-                    <button type="submit" class="btn btn-red">
-                        EXCLUIR CONTA
-                    </button>
-                </form>
-            </div>
         </div>
-    </section>
 
-    <!-- SEÇÃO EXTRA -->
-    <section class="profile-extra">
-        <div class="card">
-            <h3>Informações adicionais</h3>
-            <p>Aqui você pode mostrar histórico de serviços, preferências, observações ou outros dados relevantes do cliente.</p>
-        </div>
-    </section>
+    </div>
+
+    <!-- BOTÃO DE EXCLUSÃO -->
+    <div class="actions-container">
+        <button class="btn-delete" onclick="abrirModalExclusao()">
+            Excluir Conta
+        </button>
+
+        <!-- FORM DE EXCLUSÃO OCULTO -->
+        <form id="formExcluirConta"
+              th:action="@{/clientes/excluir/{id}(id=${cliente.id})}"
+              method="post"
+              style="display:none;">
+        </form>
+    </div>
 
 </main>
 
 <footer th:replace="~{fragments/footer :: rodape}"></footer>
+
+<!-- MODAL -->
+<div id="modalExcluir" class="modal-overlay">
+    <div class="modal-box">
+        <div class="modal-title">Tem certeza que deseja excluir sua conta?</div>
+        <div class="modal-text">Esta ação não pode ser desfeita.</div>
+
+        <div class="modal-buttons">
+            <button class="btn-confirm" onclick="confirmarExclusao()">Excluir Conta</button>
+            <button class="btn-cancel" onclick="fecharModal()">Cancelar</button>
+        </div>
+    </div>
+</div>
+
+<!-- SCRIPTS -->
+<script>
+    function previewAndSubmit(event, form) {
+        const reader = new FileReader();
+        reader.onload = function() {
+            document.getElementById("previewFotoCliente").src = reader.result;
+        };
+        reader.readAsDataURL(event.target.files[0]);
+        setTimeout(() => form.submit(), 300);
+    }
+
+    // MODAL FUNÇÕES
+    function abrirModalExclusao() {
+        document.getElementById("modalExcluir").style.display = "flex";
+    }
+
+    function fecharModal() {
+        document.getElementById("modalExcluir").style.display = "none";
+    }
+
+    function confirmarExclusao() {
+        document.getElementById("formExcluirConta").submit();
+    }
+</script>
 
 </body>
 </html>

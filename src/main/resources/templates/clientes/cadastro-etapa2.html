@@ -11,8 +11,18 @@
         <img class="logo" th:src="@{/images/logo-da-oficina.png}" alt="Logo Oficina 360">
         <h3>Finalizando a sua conta</h3>
         <div class="form-box">
-            <form th:action="@{/clientes/cadastro/etapa2}" th:object="${dto}" method="post">
-                
+            <form th:action="@{/clientes/cadastro/etapa2}" th:object="${dto}" method="post" enctype="multipart/form-data">
+            
+                <div class="photo-container">
+            		<label for="fotoClienteArquivo" class="circle-photo">
+                		<img th:src="@{/images/Perfil.png}" alt="Foto padrão">
+            		</label>
+
+            		<label for="fotoClienteArquivo" class="add-photo-text">Adicionar foto</label>
+            		<input type="file" id="fotoClienteArquivo" name="fotoClienteArquivo" accept="image/*">
+        		</div>
+        		
+        		
                 <input type="text" th:field="*{nome}" placeholder="Digite seu nome completo" required>
                 <div th:if="${#fields.hasErrors('nome')}" class="text-danger">
                     <p th:errors="*{nome}"></p>
@@ -23,6 +33,7 @@
                     <p th:errors="*{cpf}"></p>
                 </div>
 
+                <input type="text" th:field="*{contato}" placeholder="Digite seu número de telefone">
                 <input type="text" th:field="*{cidade}" placeholder="Digite sua cidade">
                 <input type="text" th:field="*{bairro}" placeholder="Digite seu bairro">
                 <input type="text" th:field="*{rua}" placeholder="Digite sua rua">
@@ -32,7 +43,7 @@
         </div>
     </div>
     <div class="right">
-        <img class="illustration" th:src="@{/images/desenho-login.png}" alt="Ilustração">
+        <img class="illustration" th:src="@{/images/Desenho da tela de login.png}" alt="Ilustração">
     </div>
 </div>
 </body>

@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel do Mecânico</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Fonte Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Ícones -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- CSS -->
+	<link rel="stylesheet" th:href="@{/css/mecanico-home.css}">
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <header th:replace="~{fragments/header :: cabecalho}"></header>
+
+    <main class="flex-grow w-full max-w-[1600px] mx-auto p-8 grid grid-cols-1 lg:grid-cols-2 gap-10">
+
+        <!-- PAINEL 1: SERVIÇOS AGENDADOS -->
+        <section class="card-painel">
+            <div class="flex justify-between items-start mb-6 border-b border-gray-100 pb-4">
+                <h2 class="text-xl font-bold text-gray-800">Serviços agendados</h2>
+                <div class="text-right">
+                    <button class="btn-datas mb-1" onclick="toggleCalendar('calendarAgendados')">Datas</button>
+                    <p id="textDataAgendados" class="text-xs font-bold text-gray-500">Hoje</p>
+                    <div id="calendarAgendados" class="calendar-popup">
+                        <div class="cal-header">
+                            <span id="titleAgendados" class="font-bold text-sm capitalize">Mês Ano</span>
+                            <div class="flex gap-1">
+                                <button class="cal-nav-btn" onclick="changeMonth('Agendados', -1)"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
+                                <button class="cal-nav-btn" onclick="changeMonth('Agendados', 1)"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-7 text-center text-xs text-gray-400 mb-2 font-medium">
+                            <div>D</div><div>S</div><div>T</div><div>Q</div><div>Q</div><div>S</div><div>S</div>
+                        </div>
+                        <div class="grid grid-cols-7 text-center" id="gridAgendados"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="listaAgendados" class="flex flex-col gap-2">
+                <p id="msgVaziaAgendados" class="text-gray-400 text-sm text-center py-10 hidden">
+                    Nenhum serviço agendado para esta data.
+                </p>
+
+                <!-- ITEM CLICKÁVEL QUE ABRE O MODAL PENDENTE -->
+                <div class="service-item" th:each="servico : ${servicosAgendados}"
+                     th:onclick="openServiceModal(
+                        [[${servico.id}]], 
+                        [[${servico.cliente.nome}]], 
+                        [[${servico.cliente.contato}]], 
+                        [[${servico.descricao}]], 
+                        [[${servico.titulo}]], 
+                        [[${#temporals.format(servico.dataAgendamento, 'dd/MM/yyyy')}]],
+                        [[${servico.cliente.foto}]]
+                     )">
+                    <div class="flex justify-between items-center mb-1">
+                        <h3 class="font-bold text-gray-900 flex items-center gap-2 text-base">
+                            <i data-lucide="wrench" class="w-4 h-4 text-gray-400"></i>
+                            <span th:text="${servico.titulo}">Troca de óleo</span>
+                        </h3>
+                        <span class="text-xs font-bold px-2 py-1 bg-yellow-100 text-yellow-700 rounded-full">PENDENTE</span>
+                    </div>
+                    <p class="text-sm text-gray-500 leading-relaxed pl-6" th:text="${servico.descricao}">Descrição...</p>
+                    <div class="pl-6 mt-2 text-xs text-gray-400 flex gap-4">
+                        <span><i data-lucide="calendar" class="w-3 h-3 inline mr-1"></i> <span class="data-servico" th:text="${#temporals.format(servico.dataAgendamento, 'dd/MM/yyyy')}">12/12/2025</span></span>
+                        <span><i data-lucide="clock" class="w-3 h-3 inline mr-1"></i> <span th:text="${servico.horaAgendamento}">14:00</span></span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PAINEL 2: SERVIÇOS FINALIZADOS -->
+        <section class="card-painel">
+            <div class="flex justify-between items-start mb-6 border-b border-gray-100 pb-4">
+                <h2 class="text-xl font-bold text-gray-800">Serviços finalizados</h2>
+                <div class="text-right">
+                    <button class="btn-datas mb-1" onclick="toggleCalendar('calendarFinalizados')">Datas</button>
+                    <p id="textDataFinalizados" class="text-xs font-bold text-gray-500">Hoje</p>
+                    <div id="calendarFinalizados" class="calendar-popup">
+                        <div class="cal-header">
+                            <span id="titleFinalizados" class="font-bold text-sm capitalize">Mês Ano</span>
+                            <div class="flex gap-1">
+                                <button class="cal-nav-btn" onclick="changeMonth('Finalizados', -1)"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
+                                <button class="cal-nav-btn" onclick="changeMonth('Finalizados', 1)"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-7 text-center text-xs text-gray-400 mb-2 font-medium">
+                            <div>D</div><div>S</div><div>T</div><div>Q</div><div>Q</div><div>S</div><div>S</div>
+                        </div>
+                        <div class="grid grid-cols-7 text-center" id="gridFinalizados"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="listaFinalizados" class="flex flex-col gap-2">
+                <p id="msgVaziaFinalizados" class="text-gray-400 text-sm text-center py-10 hidden">
+                    Nenhum serviço encontrado para esta data.
+                </p>
+                
+                <!-- ITEM CLICKÁVEL QUE ABRE O MODAL FINALIZADO -->
+                <!-- Nota: dataFinalizacao é o campo que adicionamos à classe Servico -->
+                <div class="service-item" th:each="servico : ${servicosRealizados}"
+                     th:onclick="openFinishedModal(
+                        [[${servico.id}]], 
+                        [[${servico.cliente.nome}]], 
+                        [[${servico.cliente.contato}]], 
+                        [[${servico.descricao}]], 
+                        [[${servico.titulo}]], 
+                        [[${#temporals.format(servico.dataAgendamento, 'dd/MM/yyyy')}]],
+                        [[${servico.cliente.foto}]],
+                        [[${servico.dataFinalizacao != null ? #temporals.format(servico.dataFinalizacao, 'dd/MM/yyyy') : 'N/A'}]],
+                        [[${servico.status}]]
+                     )">
+                    <div class="flex justify-between items-center mb-1">
+                        <h3 class="font-bold text-gray-900 flex items-center gap-2 text-base">
+                            <i th:class="${#strings.toString(servico.status) == 'FINALIZADO'} ? 'w-4 h-4 text-green-500' : 'w-4 h-4 text-red-500'" data-lucide="check-circle"></i>
+                            <span th:text="${servico.titulo}">Revisão Geral</span>
+                        </h3>
+                        <span th:if="${#strings.toString(servico.status) == 'FINALIZADO'}" class="text-xs font-bold px-2 py-1 bg-green-100 text-green-700 rounded-full">FINALIZADO</span>
+                        <span th:if="${#strings.toString(servico.status) == 'CANCELADO'}" class="text-xs font-bold px-2 py-1 bg-red-100 text-red-700 rounded-full">CANCELADO</span>
+                    </div>
+                    <p class="text-sm text-gray-500 leading-relaxed pl-6" th:text="${servico.descricao}">Descrição...</p>
+                    <div class="pl-6 mt-2 text-xs text-gray-400">
+                         <span><i data-lucide="calendar" class="w-3 h-3 inline mr-1"></i> <span class="data-servico" th:text="${#temporals.format(servico.dataAgendamento, 'dd/MM/yyyy')}">Data</span></span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <div id="footer-wrapper" class="w-full mt-10 border-t border-gray-200 pt-6 flex flex-col items-center justify-center text-center">
+        <div class="w-full max-w-[1600px] flex flex-col items-center">
+            <footer th:replace="~{fragments/footer :: rodape}"></footer>
+        </div>
+    </div>
+
+    <!-- MODAL DE SERVIÇO PENDENTE -->
+    <div id="serviceModal" class="modal-overlay">
+        <div class="modal-content relative">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-12 h-12 bg-gray-200 rounded-full overflow-hidden">
+                    <img id="modalClienteFoto" th:src="@{/images/Perfil.png}" class="w-full h-full object-cover">
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg">SERVIÇO PENDENTE</h3>
+                    <p class="text-sm text-gray-500" id="modalClienteNome">Nome do Cliente</p>
+                </div>
+            </div>
+
+            <div class="space-y-3 mb-6">
+                <div>
+                    <p class="text-xs font-bold text-gray-500 uppercase">Cliente</p>
+                    <p class="text-sm font-semibold" id="modalClienteDetalhe">Nome Completo</p>
+                    <p class="text-xs text-gray-400" id="modalClienteTel">Telefone</p>
+                </div>
+                <div>
+                    <p class="text-xs font-bold text-gray-500 uppercase">Problema / Título</p>
+                    <p class="text-sm" id="modalTitulo">Titulo</p>
+                </div>
+                <div>
+                    <p class="text-xs font-bold text-gray-500 uppercase">Descrição</p>
+                    <p class="text-sm text-gray-600" id="modalDescricao">Descrição do problema...</p>
+                </div>
+                <div>
+                    <p class="text-xs font-bold text-gray-500 uppercase">Data do agendamento</p>
+                    <p class="text-sm text-gray-600" id="modalData">Data</p>
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-3 border-t border-gray-100 pt-4">
+                <button onclick="closeServiceModal()" class="text-gray-500 font-semibold hover:text-gray-700 px-4 py-2">Cancelar</button>
+                <a id="btnFinalizar" href="#" class="bg-black text-white px-6 py-2 rounded font-semibold hover:bg-gray-800">Finalizar</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE SERVIÇO FINALIZADO/CANCELADO (ADICIONADO AGORA) -->
+    <div id="finishedModal" class="modal-overlay">
+        <div class="modal-content relative">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-12 h-12 bg-gray-200 rounded-full overflow-hidden">
+                    <img id="modalFinishedFoto" th:src="@{/images/Perfil.png}" class="w-full h-full object-cover">
+                </div>
+                <div>
+                    <h3 class="font-bold text-lg">ORDEM DE SERVIÇO REALIZADO</h3>
+                    <p class="text-sm text-gray-500" id="modalFinishedNome">Nome do Cliente</p>
+                </div>
+            </div>
+
+            <div class="space-y-3 mb-6">
+                <!-- Informações básicas -->
+                <div>
+                    <p class="text-xs font-bold text-gray-500 uppercase">Cliente</p>
+                    <p class="text-sm font-semibold" id="modalFinishedDetalhe">Nome</p>
+                    <p class="text-xs text-gray-400" id="modalFinishedTel">Telefone</p>
+                </div>
+                <div>
+                    <p class="text-xs font-bold text-gray-500 uppercase">Problema</p>
+                    <p class="text-sm" id="modalFinishedTitulo">Titulo</p>
+                </div>
+                <div>
+                    <p class="text-xs font-bold text-gray-500 uppercase">Descrição</p>
+                    <p class="text-sm text-gray-600" id="modalFinishedDescricao">...</p>
+                </div>
+                
+                <!-- Datas: Início e Fim -->
+                <div class="grid grid-cols-2 gap-4 mt-4">
+                    <div>
+                        <p class="text-xs font-bold text-gray-500 uppercase">Data de Agendamento</p>
+                        <p class="text-sm text-gray-600" id="modalFinishedDataInicio">Data</p>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-gray-500 uppercase">Data de Finalização</p>
+                        <p class="text-sm text-gray-600" id="modalFinishedDataFim">Data</p>
+                    </div>
+                </div>
+                
+                <!-- Status -->
+                <div class="mt-2">
+                    <span id="modalFinishedStatus" class="text-xs font-bold px-2 py-1 rounded-full">STATUS</span>
+                </div>
+            </div>
+
+            <div class="flex justify-between border-t border-gray-100 pt-4">
+                <button onclick="closeFinishedModal()" class="text-gray-500 font-semibold hover:text-gray-700 px-4 py-2">Cancelar</button>
+                <button onclick="baixarComprovanteSimulado()" class="bg-gray-800 text-white px-4 py-2 rounded font-semibold hover:bg-black text-sm">
+                    Baixar formulário
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        lucide.createIcons();
+        const now = new Date();
+        const calendarState = { 'Agendados': { year: now.getFullYear(), month: now.getMonth() }, 'Finalizados': { year: now.getFullYear(), month: now.getMonth() } };
+        const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+        let busyMap = { 'Agendados': {}, 'Finalizados': {} };
+
+        // --- MODAL PENDENTE ---
+        function openServiceModal(id, nome, telefone, descricao, titulo, data, foto) {
+            document.getElementById('modalClienteNome').innerText = nome;
+            document.getElementById('modalClienteDetalhe').innerText = nome;
+            document.getElementById('modalClienteTel').innerText = telefone;
+            document.getElementById('modalDescricao').innerText = descricao;
+            document.getElementById('modalTitulo').innerText = titulo;
+            document.getElementById('modalData').innerText = data;
+            
+            const imgEl = document.getElementById('modalClienteFoto');
+            if (foto && foto !== 'null' && foto !== '') imgEl.src = '/uploads/' + foto;
+            else imgEl.src = '/images/Perfil.png';
+            
+            document.getElementById('btnFinalizar').href = '/mecanicos/finalizar/' + id;
+            document.getElementById('serviceModal').classList.add('open');
+        }
+        function closeServiceModal() {
+            document.getElementById('serviceModal').classList.remove('open');
+        }
+
+        // --- MODAL FINALIZADO/CANCELADO (JS) ---
+        function openFinishedModal(id, nome, telefone, descricao, titulo, dataInicio, foto, dataFim, status) {
+            document.getElementById('modalFinishedNome').innerText = nome;
+            document.getElementById('modalFinishedDetalhe').innerText = nome;
+            document.getElementById('modalFinishedTel').innerText = telefone;
+            document.getElementById('modalFinishedDescricao').innerText = descricao;
+            document.getElementById('modalFinishedTitulo').innerText = titulo;
+            document.getElementById('modalFinishedDataInicio').innerText = dataInicio;
+            document.getElementById('modalFinishedDataFim').innerText = dataFim;
+            
+            const statusEl = document.getElementById('modalFinishedStatus');
+            statusEl.innerText = status;
+            if(status === 'FINALIZADO') {
+                statusEl.className = 'text-xs font-bold px-2 py-1 bg-green-100 text-green-700 rounded-full';
+            } else {
+                statusEl.className = 'text-xs font-bold px-2 py-1 bg-red-100 text-red-700 rounded-full';
+            }
+
+            const imgEl = document.getElementById('modalFinishedFoto');
+            if (foto && foto !== 'null' && foto !== '') imgEl.src = '/uploads/' + foto;
+            else imgEl.src = '/images/Perfil.png';
+            
+            document.getElementById('finishedModal').classList.add('open');
+        }
+        function closeFinishedModal() {
+            document.getElementById('finishedModal').classList.remove('open');
+        }
+        function baixarComprovanteSimulado() {
+            alert("Simulação: Formulário baixado com sucesso!");
+            closeFinishedModal();
+        }
+
+        // --- CALENDÁRIOS ---
+        function extractDatesFromDOM(type) {
+            const containerId = type === 'Agendados' ? 'listaAgendados' : 'listaFinalizados';
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            const dates = container.querySelectorAll('.data-servico');
+            dates.forEach(span => {
+                const dateText = span.textContent.trim(); 
+                const parts = dateText.split('/');
+                if (parts.length === 3) {
+                    const day = parseInt(parts[0], 10);
+                    const month = parseInt(parts[1], 10) - 1; 
+                    let year = parseInt(parts[2], 10);
+                    if (year < 100) year += 1900; 
+                    const key = year + '-' + month;
+                    if (!busyMap[type][key]) busyMap[type][key] = [];
+                    if (!busyMap[type][key].includes(day)) busyMap[type][key].push(day);
+                }
+            });
+        }
+
+        extractDatesFromDOM('Agendados');
+        extractDatesFromDOM('Finalizados');
+
+        function toggleCalendar(id) {
+            const el = document.getElementById(id);
+            document.querySelectorAll('.calendar-popup').forEach(cal => { if(cal.id !== id) cal.classList.remove('active'); });
+            el.classList.toggle('active');
+        }
+
+        function changeMonth(type, step) {
+            const state = calendarState[type];
+            state.month += step;
+            if (state.month > 11) { state.month = 0; state.year++; } else if (state.month < 0) { state.month = 11; state.year--; }
+            renderCalendar(type);
+        }
+
+        function filterListByDate(type, dateString) {
+            const containerId = type === 'Agendados' ? 'listaAgendados' : 'listaFinalizados';
+            const msgId = type === 'Agendados' ? 'msgVaziaAgendados' : 'msgVaziaFinalizados';
+            const container = document.getElementById(containerId);
+            const items = container.querySelectorAll('.service-item');
+            const msgElement = document.getElementById(msgId);
+            let visibleCount = 0;
+            items.forEach(item => {
+                const dateElement = item.querySelector('.data-servico');
+                if (dateElement) {
+                    const itemDate = dateElement.textContent.trim();
+                    if (itemDate === dateString) { item.classList.remove('hidden-item'); visibleCount++; } else { item.classList.add('hidden-item'); }
+                }
+            });
+            if (visibleCount === 0) { if(msgElement) msgElement.classList.remove('hidden'); } else { if(msgElement) msgElement.classList.add('hidden'); }
+        }
+
+        function renderCalendar(type) {
+            const state = calendarState[type];
+            const containerId = 'grid' + type;
+            const titleId = 'title' + type;
+            const displayId = 'textData' + type;
+            const key = state.year + '-' + state.month;
+            const busyDays = busyMap[type][key] || [];
+            document.getElementById(titleId).innerText = `${monthNames[state.month]} ${state.year}`;
+            const container = document.getElementById(containerId);
+            if(!container) return;
+            container.innerHTML = '';
+            const firstDayIndex = new Date(state.year, state.month, 1).getDay(); 
+            const daysInMonth = new Date(state.year, state.month + 1, 0).getDate();
+            for(let i=0; i<firstDayIndex; i++) container.appendChild(document.createElement('div'));
+            for(let i=1; i<=daysInMonth; i++) {
+                const dayDiv = document.createElement('div');
+                dayDiv.textContent = i;
+                dayDiv.className = 'calendar-day';
+                if (busyDays.includes(i)) {
+                    if (type === 'Finalizados') dayDiv.classList.add('has-service-yellow');
+                    else dayDiv.classList.add('has-service');
+                    dayDiv.title = "Possui registro";
+                }
+                dayDiv.onclick = function() {
+                    container.querySelectorAll('.calendar-day').forEach(d => d.classList.remove('selected-day'));
+                    dayDiv.classList.add('selected-day');
+                    const dayStr = i < 10 ? '0'+i : i;
+                    const monthStr = (state.month + 1) < 10 ? '0'+(state.month+1) : (state.month+1);
+                    const dataFormatada = `${dayStr}/${monthStr}/${state.year}`;
+                    document.getElementById(displayId).innerText = dataFormatada;
+                    filterListByDate(type, dataFormatada);
+                    setTimeout(() => { toggleCalendar('calendar' + type); }, 200);
+                };
+                container.appendChild(dayDiv);
+            }
+        }
+
+        renderCalendar('Agendados');
+        renderCalendar('Finalizados');
+
+        const currentDay = String(now.getDate()).padStart(2, '0');
+        const currentMonth = String(now.getMonth() + 1).padStart(2, '0');
+        const currentYear = now.getFullYear();
+        const todayStr = `${currentDay}/${currentMonth}/${currentYear}`;
+        
+        const displayAg = document.getElementById('textDataAgendados');
+        if(displayAg) displayAg.innerText = todayStr;
+        const displayFin = document.getElementById('textDataFinalizados');
+        if(displayFin) displayFin.innerText = todayStr;
+
+        filterListByDate('Agendados', todayStr);
+        filterListByDate('Finalizados', todayStr);
+
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('.card-painel')) {
+                document.querySelectorAll('.calendar-popup').forEach(cal => cal.classList.remove('active'));
+            }
+        });
+    </script>
+</body>
+</html>

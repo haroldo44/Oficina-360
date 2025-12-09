@@ -1,10 +1,18 @@
 package edu.ifpb.oficina360.controller;
 
+import java.time.LocalDate; // Importação necessária para a data
+import java.util.List;
+
+import edu.ifpb.oficina360.model.Mecanico;
 import edu.ifpb.oficina360.model.MecanicoCadastroDTO;
+import edu.ifpb.oficina360.model.Servico;
 import edu.ifpb.oficina360.service.MecanicoService;
+import edu.ifpb.oficina360.service.ServicoService;
 import edu.ifpb.oficina360.repository.OficinaRepository;
+import edu.ifpb.oficina360.repository.ServicoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,6 +29,81 @@ public class MecanicoController {
 
     @Autowired
     private MecanicoService mecanicoService;
+    
+    @Autowired
+    private ServicoService servicoService;
+    
+    @Autowired
+    private ServicoRepository servicoRepository;
+
+    // ===================== HOME DO MECÂNICO =====================
+    @GetMapping("/home/{id}")
+    public String home(@PathVariable Long id, Model model) {
+        Mecanico mecanico = mecanicoService.buscarPorId(id);
+        if (mecanico == null) {
+            return "redirect:/login";
+        }
+
+        model.addAttribute("mecanico", mecanico);
+        
+        // Serviços Pendentes
+        model.addAttribute("servicosAgendados", 
+            servicoService.buscarPorMecanicoEStatus(mecanico, "PENDENTE"));
+        
+        // Serviços Realizados (Histórico Completo)
+        model.addAttribute("servicosRealizados", 
+            servicoService.listarHistoricoMecanico(mecanico));
+
+        return "mecanicos/mecanico-home";
+    }
+
+    // ===================== PÁGINA DE FINALIZAR SERVIÇO =====================
+    @GetMapping("/finalizar/{id}")
+    public String paginaFinalizarServico(@PathVariable Long id, Model model) {
+        Servico servico = servicoRepository.findById(id).orElse(null);
+        
+        if (servico == null) {
+            return "redirect:/";
+        }
+        
+        // Passa o serviço e o mecânico para o modelo
+        model.addAttribute("servico", servico);
+        model.addAttribute("mecanico", servico.getMecanico()); 
+        
+        return "servicos/finalizar-servico";
+    }
+
+    // ===================== CONCLUIR SERVIÇO (POST) =====================
+    @PostMapping("/concluir/{id}")
+    public String concluirServico(
+            @PathVariable Long id,
+            @RequestParam("veiculoModelo") String veiculoModelo,
+            @RequestParam("veiculoPlaca") String veiculoPlaca,
+            @RequestParam("diagnosticoMecanico") String diagnostico,
+            @RequestParam("solucaoAplicada") String solucao,
+            @RequestParam(value = "pecasTrocadas", required = false) String pecas,
+            @RequestParam(value = "valorPecas", defaultValue = "0") Double valorPecas,
+            @RequestParam("valorMaoDeObra") Double valorMaoDeObra,
+            RedirectAttributes attr) {
+
+        Servico servico = servicoRepository.findById(id).orElse(null);
+        if (servico != null) {
+            servico.setStatus("FINALIZADO");
+            
+            // --- IMPORTANTE: SALVA A DATA DE FINALIZAÇÃO ---
+            servico.setDataFinalizacao(LocalDate.now());
+            
+            servicoRepository.save(servico);
+            
+            System.out.println(">>> ENVIANDO COMPROVANTE POR EMAIL PARA: " + servico.getCliente().getEmail());
+            System.out.println("Serviço ID " + id + " Finalizado.");
+
+            attr.addFlashAttribute("sucesso", "Serviço finalizado com sucesso! Comprovante enviado.");
+            return "redirect:/mecanicos/home/" + servico.getMecanico().getId();
+        }
+
+        return "redirect:/";
+    }
 
     // ===================== ADICIONAR MECÂNICO =====================
     @PostMapping("/adicionar/{oficinaId}")
@@ -88,10 +171,9 @@ public class MecanicoController {
                                  @ModelAttribute MecanicoCadastroDTO dto,
                                  @RequestParam("fotoPerfil") MultipartFile fotoPerfil,
                                  RedirectAttributes attr) {
-        dto.setFotoArquivo(fotoPerfil); // atualiza a foto
+        dto.setFotoArquivo(fotoPerfil);
         mecanicoService.editarMecanico(id, dto);
         attr.addFlashAttribute("sucesso", "Mecânico atualizado com sucesso!");
         return "redirect:/oficinas/home/" + dto.getOficinaId();
     }
-
 }

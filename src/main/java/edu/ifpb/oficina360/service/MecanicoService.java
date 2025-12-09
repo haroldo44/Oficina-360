@@ -33,7 +33,6 @@ public class MecanicoService {
     private String salvarFoto(MultipartFile foto) throws IOException {
         Path uploadPath = Paths.get(UPLOAD_DIR);
 
-        // Garante que o diretório 'uploads/' existe
         if (!Files.exists(uploadPath)) {
             Files.createDirectories(uploadPath);
         }
@@ -46,9 +45,6 @@ public class MecanicoService {
         return nomeArquivo;
     }
 
-    /**
-     * Converte o DTO para Entidade, lida com horários e foto, e salva o Mecânico.
-     */
     @Transactional
     public Mecanico salvarMecanico(MecanicoCadastroDTO dto, Long oficinaId) throws IOException {
 
@@ -57,15 +53,15 @@ public class MecanicoService {
 
         Mecanico mecanico = new Mecanico();
 
-        // 1. Processar e salvar foto (usa o arquivo que foi anexado no Controller)
+        // 1. Processar foto
         if (dto.getFotoArquivo() != null && !dto.getFotoArquivo().isEmpty()) {
             String nomeFoto = salvarFoto(dto.getFotoArquivo());
             mecanico.setNomeArquivoFoto(nomeFoto);
         } else {
-            mecanico.setNomeArquivoFoto(null); // Define como NULL se não houver foto
+            mecanico.setNomeArquivoFoto(null);
         }
 
-        // 2. Converter String de Horário para LocalTime (Pode lançar DateTimeParseException)
+        // 2. Converter Horários
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
 
         mecanico.setTurnoManhaInicio(LocalTime.parse(dto.getTurnoManhaInicioString(), formatter));
@@ -73,16 +69,14 @@ public class MecanicoService {
         mecanico.setTurnoTardeInicio(LocalTime.parse(dto.getTurnoTardeInicioString(), formatter));
         mecanico.setTurnoTardeFim(LocalTime.parse(dto.getTurnoTardeFimString(), formatter));
 
-        // 3. Setar dados e relacionamento
+        // 3. Setar dados
         mecanico.setNomeCompleto(dto.getNomeCompleto());
         mecanico.setEmail(dto.getEmail());
         mecanico.setSenha(dto.getSenha());
         mecanico.setNumeroTelefone(dto.getNumeroTelefone());
         mecanico.setOficina(oficina);
 
-        // O campo 'horaInicio' da Entidade Mecanico parece ser redundante e deve ser removido ou setado.
-        // Se você não o removeu, defina ele para evitar NOT NULL (usando o inicio da manhã como placeholder)
-        // Se a Entidade Mecanico for corrigida para remover este campo, esta linha é desnecessária.
+        // Define horaInicio para evitar null, caso o campo ainda exista no banco
         if (mecanico.getHoraInicio() == null) {
             mecanico.setHoraInicio(mecanico.getTurnoManhaInicio());
         }
@@ -106,15 +100,16 @@ public class MecanicoService {
         mecanico.setEmail(dto.getEmail());
         mecanico.setSenha(dto.getSenha());
         mecanico.setNumeroTelefone(dto.getNumeroTelefone());
+        
+        // Conversão de String para LocalTime na edição
         mecanico.setTurnoManhaInicio(LocalTime.parse(dto.getTurnoManhaInicioString()));
         mecanico.setTurnoManhaFim(LocalTime.parse(dto.getTurnoManhaFimString()));
         mecanico.setTurnoTardeInicio(LocalTime.parse(dto.getTurnoTardeInicioString()));
         mecanico.setTurnoTardeFim(LocalTime.parse(dto.getTurnoTardeFimString()));
 
-        // Atualiza a foto se foi enviada
         if (dto.getFotoArquivo() != null && !dto.getFotoArquivo().isEmpty()) {
             try {
-                String nomeArquivo = salvarFoto(dto.getFotoArquivo()); // método que grava no disco
+                String nomeArquivo = salvarFoto(dto.getFotoArquivo());
                 mecanico.setNomeArquivoFoto(nomeArquivo);
             } catch (IOException e) {
                 throw new RuntimeException("Erro ao salvar foto do mecânico: " + e.getMessage(), e);
@@ -124,8 +119,13 @@ public class MecanicoService {
         mecanicoRepository.save(mecanico);
     }
 
+    // --- MÉTODO ADICIONADO PARA CORRIGIR O ERRO ---
+    public Mecanico buscarPorId(Long id) {
+        return mecanicoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Mecânico não encontrado com id: " + id));
+    }
     
-    
-
-
+    public Mecanico buscarPorEmail(String email) {
+        return mecanicoRepository.findByEmail(email).orElse(null);
+    }
 }

@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solicitar Serviço - Etapa 1</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Ícones Lucide -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        /* Transição suave para os cartões */
+        .option-card { transition: all 0.2s ease-in-out; }
+        .option-card:hover { transform: translateY(-2px); }
+    </style>
+</head>
+<body class="bg-white min-h-screen flex flex-col pb-20 pt-10">
+	
+    <!-- Mensagem de Erro (caso exista) -->
+    <div th:if="${erro}" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mx-auto mb-6 max-w-[1400px]">
+        <span class="block sm:inline" th:text="${erro}"></span>
+    </div>
+
+    <div class="flex-grow w-full">
+        <div class="max-w-[1400px] mx-auto px-4">
+            
+            <h1 class="text-center text-gray-800 text-2xl md:text-3xl mb-12 font-bold">
+                Descreva o problema ou selecione uma opção
+            </h1>
+
+            <form th:action="@{/clientes/solicitar-servico/etapa1}" method="post" id="formRelatorio">
+                
+                <input type="hidden" name="idCliente" th:value="${cliente.id}">
+                <!-- Input oculto para controle do backend -->
+                <input type="hidden" name="opcaoSelecionada" id="inputOpcao">
+
+                <!-- 1. CAMPO DE TÍTULO DO PROBLEMA -->
+                <div class="mb-8">
+                    <label class="block text-gray-700 text-lg font-bold mb-3 pl-1">
+                        Título do Problema
+                    </label>
+                    <input type="text" 
+                           id="inputTitulo" 
+                           class="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:border-black focus:ring-1 focus:ring-black text-gray-900 placeholder-gray-400 shadow-sm text-lg bg-gray-50"
+                           placeholder="Ex: Barulho estranho no motor..." 
+                           required>
+                </div>
+
+                <!-- 2. CARTÕES DE OPÇÕES RÁPIDAS -->
+                <p class="text-sm text-gray-500 mb-4 pl-1 font-medium">Ou selecione uma opção rápida abaixo:</p>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+                    
+                    <div class="option-card group bg-white p-6 rounded-lg cursor-pointer border border-gray-200 shadow-sm hover:shadow-md flex flex-col items-center text-center h-full"
+                         onclick="selectCard(this, 'Balanceamento')">
+                        <div class="mb-4 text-black"><i data-lucide="triangle-alert" width="40" height="40"></i></div>
+                        <h3 class="text-lg font-bold mb-2 text-black">Balanceamento</h3>
+                        <p class="text-sm text-gray-600">Elimina vibrações e melhora a rodagem.</p>
+                    </div>
+
+                    <div class="option-card group bg-white p-6 rounded-lg cursor-pointer border border-gray-200 shadow-sm hover:shadow-md flex flex-col items-center text-center h-full"
+                         onclick="selectCard(this, 'Trocar óleo')">
+                        <div class="mb-4 text-black"><i data-lucide="droplet" width="40" height="40"></i></div>
+                        <h3 class="text-lg font-bold mb-2 text-black">Trocar óleo</h3>
+                        <p class="text-sm text-gray-600">Manutenção básica do motor.</p>
+                    </div>
+
+                    <div class="option-card group bg-white p-6 rounded-lg cursor-pointer border border-gray-200 shadow-sm hover:shadow-md flex flex-col items-center text-center h-full"
+                         onclick="selectCard(this, 'Trocar farol')">
+                        <div class="mb-4 text-black"><i data-lucide="lightbulb" width="40" height="40"></i></div>
+                        <h3 class="text-lg font-bold mb-2 text-black">Trocar farol</h3>
+                        <p class="text-sm text-gray-600">Substituição de lâmpadas.</p>
+                    </div>
+
+                    <div class="option-card group bg-white p-6 rounded-lg cursor-pointer border border-gray-200 shadow-sm hover:shadow-md flex flex-col items-center text-center h-full"
+                         onclick="selectCard(this, 'Troca de pneu')">
+                        <div class="mb-4 text-black"><i data-lucide="circle-dot" width="40" height="40"></i></div>
+                        <h3 class="text-lg font-bold mb-2 text-black">Troca de pneu</h3>
+                        <p class="text-sm text-gray-600">Substituição de pneus gastos.</p>
+                    </div>
+
+                    <div class="option-card group bg-white p-6 rounded-lg cursor-pointer border border-gray-200 shadow-sm hover:shadow-md flex flex-col items-center text-center h-full"
+                         onclick="selectCard(this, 'Falha elétrica')">
+                        <div class="mb-4 text-black"><i data-lucide="zap" width="40" height="40"></i></div>
+                        <h3 class="text-lg font-bold mb-2 text-black">Falha elétrica</h3>
+                        <p class="text-sm text-gray-600">Problemas de bateria ou fiação.</p>
+                    </div>
+
+                    <div class="option-card group bg-white p-6 rounded-lg cursor-pointer border border-gray-200 shadow-sm hover:shadow-md flex flex-col items-center text-center h-full"
+                         onclick="selectCard(this, 'Suspensão')">
+                        <div class="mb-4 text-black"><i data-lucide="activity" width="40" height="40"></i></div>
+                        <h3 class="text-lg font-bold mb-2 text-black">Suspensão</h3>
+                        <p class="text-sm text-gray-600">Ruídos e instabilidade.</p>
+                    </div>
+
+                    <div class="option-card group bg-white p-6 rounded-lg cursor-pointer border border-gray-200 shadow-sm hover:shadow-md flex flex-col items-center text-center h-full"
+                         onclick="selectCard(this, 'Freios')">
+                        <div class="mb-4 text-black"><i data-lucide="octagon" width="40" height="40"></i></div>
+                        <h3 class="text-lg font-bold mb-2 text-black">Freios</h3>
+                        <p class="text-sm text-gray-600">Segurança e pastilhas.</p>
+                    </div>
+
+                    <div class="option-card group bg-white p-6 rounded-lg cursor-pointer border border-gray-200 shadow-sm hover:shadow-md flex flex-col items-center text-center h-full"
+                         onclick="selectCard(this, 'Superaquecimento')">
+                        <div class="mb-4 text-black"><i data-lucide="thermometer" width="40" height="40"></i></div>
+                        <h3 class="text-lg font-bold mb-2 text-black">Superaquecimento</h3>
+                        <p class="text-sm text-gray-600">Motor esquentando muito.</p>
+                    </div>
+
+                </div>
+
+                <!-- 3. CAMPO DE DESCRIÇÃO -->
+                <div class="mb-12">
+                    <label class="block text-gray-700 text-lg font-bold mb-3 pl-1">
+                        Descrição Detalhada (Opcional)
+                    </label>
+                    <div class="relative">
+                        <textarea
+                            name="descricao"
+                            id="descricaoInput"
+                            class="w-full h-48 p-4 border border-gray-200 rounded-lg resize-none focus:outline-none focus:border-gray-400 focus:ring-0 text-gray-700 placeholder-gray-400 shadow-sm text-base"
+                            placeholder="Caso queira dar mais detalhes sobre o problema..."
+                        ></textarea>
+                        <div class="absolute bottom-4 right-4 text-gray-300 text-sm" id="charCount">
+                            0/5000
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botão Prosseguir -->
+                <div class="flex justify-center pb-10">
+                    <button
+                        type="submit"
+                        class="bg-[#2D2D2D] hover:bg-black text-white text-lg font-medium py-4 px-20 rounded-lg transition-colors duration-300 min-w-[300px]"
+                    >
+                        Prosseguir
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+    <!-- SCRIPT DE LÓGICA -->
+    <script>
+        lucide.createIcons();
+
+        let currentSelectedCard = null;
+        const inputTitulo = document.getElementById('inputTitulo');
+        const inputOpcao = document.getElementById('inputOpcao'); // Campo oculto para o backend
+
+        // Função para limpar visualmente todos os cartões
+        function deselectAllCards() {
+            document.querySelectorAll('.option-card').forEach(card => {
+                card.classList.remove('border-black', 'ring-1', 'ring-black', 'bg-gray-50');
+                card.classList.add('border-gray-200');
+            });
+            currentSelectedCard = null;
+            inputOpcao.value = ""; // Limpa o valor oculto
+        }
+
+        // Função ao clicar no cartão
+        function selectCard(element, valorTitulo) {
+            
+            // Lógica de Toggle: Se clicar no que já está selecionado, desmarca tudo
+            if (currentSelectedCard === element) {
+                deselectAllCards();
+                inputTitulo.value = ""; // Limpa o título visível
+                return;
+            }
+
+            // Se for um novo cartão
+            deselectAllCards(); // Limpa os outros
+            
+            // Marca o atual
+            element.classList.remove('border-gray-200');
+            element.classList.add('border-black', 'ring-1', 'ring-black', 'bg-gray-50');
+            
+            currentSelectedCard = element;
+            inputTitulo.value = valorTitulo; // Preenche o título visível
+            inputOpcao.value = valorTitulo;  // Preenche o valor oculto
+        }
+
+        // Monitora digitação no Título
+        inputTitulo.addEventListener('input', function() {
+            // Se o usuário digitar algo, desmarca os cartões (vira personalizado)
+            if (currentSelectedCard) {
+                deselectAllCards();
+            }
+            // Atualiza o input oculto com o que está sendo digitado
+            inputOpcao.value = this.value; 
+        });
+
+        // Monitora digitação na Descrição
+        document.getElementById('descricaoInput').addEventListener('input', function(e) {
+            // Se digitar na descrição, também desmarca os cartões por garantia
+            if (currentSelectedCard) {
+                deselectAllCards();
+                // O título permanece o que estava escrito, mas o "vinculo" com o cartão some
+            }
+
+            const currentLength = e.target.value.length;
+            const maxLength = 5000;
+            document.getElementById('charCount').textContent = `${currentLength}/${maxLength}`;
+        });
+    </script>
+</body>
+</html>

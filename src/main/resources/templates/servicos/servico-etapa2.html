@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selecionar Mecânico</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body class="bg-white min-h-screen flex flex-col items-center py-10">
+
+    <h1 class="text-2xl font-bold mb-10 text-gray-800">Selecione um dos mecânico abaixo</h1>
+
+    <form th:action="@{/clientes/solicitar-servico/etapa2}" method="post" id="formMecanico" class="w-full max-w-6xl px-4">
+        
+        <input type="hidden" name="idMecanico" id="inputMecanico">
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+            
+            <!-- Loop de Mecânicos -->
+            <div th:each="m : ${mecanicos}" 
+                 class="card-mecanico group cursor-pointer flex flex-col items-center"
+                 th:attr="data-id=${m.id}">
+                
+                <div class="w-full aspect-[3/4] overflow-hidden rounded-lg mb-4 border-2 border-transparent transition-all duration-200 shadow-md">
+                    <!-- Foto do Mecânico (ou placeholder) -->
+                    <img th:if="${m.nomeArquivoFoto != null}" 
+                         th:src="@{'/uploads/' + ${m.nomeArquivoFoto}}" 
+                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                         alt="Foto Mecânico">
+                    <img th:unless="${m.nomeArquivoFoto != null}" 
+                         src="https://via.placeholder.com/300x400?text=Mecanico" 
+                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                         alt="Sem Foto">
+                </div>
+                
+                <h3 class="text-xl font-bold text-gray-800 border-b-2 border-transparent pb-1 transition-all" th:text="${m.nomeCompleto}">Nome do Mecânico</h3>
+            </div>
+
+            <!-- Caso não haja mecânicos -->
+            <p th:if="${#lists.isEmpty(mecanicos)}" class="col-span-4 text-center text-gray-500">
+                Nenhum mecânico disponível nesta oficina no momento.
+            </p>
+
+        </div>
+
+        <div class="flex justify-center">
+            <button type="button" onclick="submitForm()" disabled id="btnProsseguir"
+                class="bg-[#2D2D2D] hover:bg-black text-white text-base py-3 px-16 rounded transition-colors duration-300 min-w-[300px] disabled:opacity-50 disabled:cursor-not-allowed">
+                Prosseguir
+            </button>
+        </div>
+    </form>
+
+    <script>
+        const cards = document.querySelectorAll('.card-mecanico');
+        const input = document.getElementById('inputMecanico');
+        const btn = document.getElementById('btnProsseguir');
+
+        cards.forEach(card => {
+            card.addEventListener('click', () => {
+                // Remove seleção de todos
+                cards.forEach(c => {
+                    c.querySelector('div').classList.remove('border-black', 'ring-2', 'ring-black');
+                    c.querySelector('h3').classList.remove('border-black');
+                });
+
+                // Adiciona seleção ao clicado
+                card.querySelector('div').classList.add('border-black', 'ring-2', 'ring-black');
+                card.querySelector('h3').classList.add('border-black');
+                
+                // Atualiza input
+                input.value = card.getAttribute('data-id');
+                btn.disabled = false;
+            });
+        });
+
+        function submitForm() {
+            document.getElementById('formMecanico').submit();
+        }
+    </script>
+
+</body>
+</html>

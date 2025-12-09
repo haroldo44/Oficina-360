@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selecionar Data e Horário</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .calendar-day:hover:not(.disabled) { background-color: #f3f4f6; cursor: pointer; }
+        .calendar-day.selected { background-color: #2D2D2D; color: white; }
+        .calendar-day.disabled { color: #ccc; cursor: not-allowed; }
+        #slotsContainer::-webkit-scrollbar { width: 6px; }
+        #slotsContainer::-webkit-scrollbar-thumb { background-color: #ccc; border-radius: 4px; }
+    </style>
+</head>
+<body class="bg-white min-h-screen flex flex-col items-center py-10">
+	
+	
+    <!-- Mensagem de Erro -->
+    <div th:if="${erro}" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+        <span th:text="${erro}"></span>
+    </div>
+
+    <h1 class="text-2xl font-bold mb-2 text-gray-800">Selecione uma data e horário</h1>
+    <p class="text-gray-500 mb-10">Mecânico: <span th:text="${mecanico.nomeCompleto}" class="font-bold"></span></p>
+
+    <!-- FORMULÁRIO -->
+    <!-- Layout Ajustado: gap-24 e justify-between para afastar bem as colunas -->
+    <form th:action="@{/clientes/solicitar-servico/finalizar}" method="post" id="formFinal" 
+          class="flex flex-col md:flex-row w-full max-w-6xl px-8 justify-between items-start gap-10 lg:gap-24">
+        
+        <input type="hidden" name="data" id="inputData">
+        <input type="hidden" name="hora" id="inputHora">
+
+        <!-- LADO ESQUERDO: CALENDÁRIO -->
+        <div class="flex-1 w-full max-w-3xl">
+            <div class="flex justify-between items-center mb-6">
+                <button type="button" id="prevMonth" class="p-2 hover:bg-gray-100 rounded"><i data-lucide="chevron-left"></i></button>
+                <h2 id="monthYearDisplay" class="text-xl font-bold capitalize">Outubro, 2025</h2>
+                <button type="button" id="nextMonth" class="p-2 hover:bg-gray-100 rounded"><i data-lucide="chevron-right"></i></button>
+            </div>
+
+            <div class="grid grid-cols-7 text-center mb-4 text-gray-400 font-medium text-sm uppercase tracking-wider">
+                <div>Dom</div><div>Seg</div><div>Ter</div><div>Qua</div><div>Qui</div><div>Sex</div><div>Sáb</div>
+            </div>
+
+            <div id="calendarGrid" class="grid grid-cols-7 text-center gap-y-6 text-lg font-medium text-gray-700">
+                <!-- Dias gerados via JS -->
+            </div>
+        </div>
+
+        <!-- LADO DIREITO: HORÁRIOS -->
+        <div class="w-full md:w-80 bg-white border border-gray-200 rounded-lg p-6 shadow-sm h-[600px] flex flex-col sticky top-10">
+            <h3 class="font-bold text-gray-800 mb-4 border-b pb-2 text-center">Horários</h3>
+            
+            <div id="slotsContainer" class="flex-1 overflow-y-auto pr-2 space-y-2">
+                <p class="text-gray-400 text-sm text-center py-4">Selecione uma data no calendário.</p>
+            </div>
+
+            <!-- Botão de Confirmar -->
+            <button type="submit" id="btnConfirmar" disabled 
+                class="w-full mt-6 bg-[#2D2D2D] hover:bg-black text-white py-4 rounded-lg font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-wide">
+                Confirmar Agendamento
+            </button>
+        </div>
+
+    </form>
+    
+    <!-- Dados do mecânico -->
+    <div id="mecanicoData" 
+         th:data-manha-inicio="${mecanico.turnoManhaInicio}"
+         th:data-manha-fim="${mecanico.turnoManhaFim}"
+         th:data-tarde-inicio="${mecanico.turnoTardeInicio}"
+         th:data-tarde-fim="${mecanico.turnoTardeFim}"
+         style="display:none;"></div>
+
+    <script>
+        lucide.createIcons();
+
+        const calendarGrid = document.getElementById('calendarGrid');
+        const monthYearDisplay = document.getElementById('monthYearDisplay');
+        const slotsContainer = document.getElementById('slotsContainer');
+        const inputData = document.getElementById('inputData');
+        const inputHora = document.getElementById('inputHora');
+        const btnConfirmar = document.getElementById('btnConfirmar');
+        
+        let currentDate = new Date();
+        let selectedDate = null;
+
+        // Recupera turnos do mecânico
+        const mecData = document.getElementById('mecanicoData').dataset;
+
+        function renderCalendar(date) {
+            calendarGrid.innerHTML = '';
+            const year = date.getFullYear();
+            const month = date.getMonth();
+            monthYearDisplay.textContent = date.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const today = new Date();
+            today.setHours(0,0,0,0);
+
+            for (let i = 0; i < firstDay; i++) calendarGrid.appendChild(document.createElement('div'));
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayEl = document.createElement('div');
+                dayEl.textContent = day;
+                dayEl.className = 'calendar-day w-10 h-10 mx-auto flex items-center justify-center rounded-full hover:bg-gray-100 cursor-pointer transition-all font-medium';
+                const thisDate = new Date(year, month, day);
+                if (thisDate < today) dayEl.classList.add('disabled', 'text-gray-300', 'cursor-not-allowed', 'hover:bg-transparent');
+                else dayEl.addEventListener('click', () => selectDate(thisDate, dayEl));
+                if (selectedDate && thisDate.getTime() === selectedDate.getTime()) dayEl.classList.add('selected', 'bg-black', 'text-white', 'hover:bg-gray-800');
+                calendarGrid.appendChild(dayEl);
+            }
+        }
+
+        function selectDate(date, el) {
+            document.querySelectorAll('.calendar-day').forEach(d => d.classList.remove('selected', 'bg-black', 'text-white', 'hover:bg-gray-800'));
+            el.classList.add('selected', 'bg-black', 'text-white', 'hover:bg-gray-800');
+            selectedDate = date;
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            inputData.value = `${year}-${month}-${day}`;
+            generateSlots();
+            btnConfirmar.disabled = true;
+        }
+
+        function generateSlots() {
+            slotsContainer.innerHTML = '';
+            
+            const toMins = (str) => {
+                if(!str) return 0;
+                const [h, m] = str.split(':').map(Number);
+                return h * 60 + m;
+            };
+
+            // CORREÇÃO 1: Trata 00:00 como final do dia (1440 mins)
+            const getEndTime = (str) => {
+                if (!str) return 0;
+                if (str.startsWith("00:00")) return 1440; 
+                return toMins(str);
+            };
+
+            // 1. Coleta TODOS os slots disponíveis
+            let allSlots = [];
+            const rawRanges = [
+                { start: toMins(mecData.manhaInicio), end: getEndTime(mecData.manhaFim) },
+                { start: toMins(mecData.tardeInicio), end: getEndTime(mecData.tardeFim) }
+            ];
+
+            rawRanges.forEach(range => {
+                if(range.start < range.end) {
+                    // CORREÇÃO 2: Loop INCLUSIVO (<=) para mostrar o último horário (ex: 17:00)
+                    // Exceto se for 24:00 (1440), aí ignora
+                    for (let time = range.start; time <= range.end; time += 60) {
+                        if (time === 1440) continue; 
+                        allSlots.push(time);
+                    }
+                }
+            });
+
+            // Ordena e remove duplicatas
+            allSlots.sort((a, b) => a - b);
+            allSlots = [...new Set(allSlots)];
+
+            // 2. Separa em Manhã e Tarde (Corte: 12:00 = 720 mins)
+            const groups = {
+                "--- MANHÃ ---": allSlots.filter(t => t < 720),
+                "--- TARDE ---": allSlots.filter(t => t >= 720)
+            };
+
+            let hasSlots = false;
+
+            // 3. Renderiza com Títulos
+            Object.entries(groups).forEach(([label, times]) => {
+                if (times.length > 0) {
+                    hasSlots = true;
+                    // Título do Turno
+                    const header = document.createElement('div');
+                    header.className = 'w-full text-center font-bold text-gray-500 mt-4 mb-2 text-xs uppercase tracking-wider border-b border-gray-100 pb-1';
+                    header.innerText = label;
+                    slotsContainer.appendChild(header);
+
+                    times.forEach(time => {
+                        const h = Math.floor(time / 60).toString().padStart(2, '0');
+                        const m = (time % 60).toString().padStart(2, '0');
+                        const timeStr = `${h}:${m}`;
+
+                        const slotBtn = document.createElement('div');
+                        slotBtn.className = 'slot-btn border border-gray-200 rounded-lg p-3 cursor-pointer hover:border-black hover:bg-gray-50 transition-all flex justify-between items-center bg-white group mb-2';
+                        slotBtn.innerHTML = `
+                            <span class="font-bold text-sm text-gray-700 group-hover:text-black">${timeStr}</span>
+                            <span class="text-[10px] uppercase font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full">Livre</span>
+                        `;
+
+                        slotBtn.addEventListener('click', () => {
+                            // Limpa seleção
+                            document.querySelectorAll('.slot-btn').forEach(c => {
+                                c.classList.remove('bg-black', 'border-black', 'text-white', 'ring-1', 'ring-black');
+                                c.classList.add('bg-white', 'border-gray-200');
+                                c.querySelector('span:first-child').classList.remove('text-white');
+                                c.querySelector('span:last-child').classList.remove('bg-white/20', 'text-white');
+                                c.querySelector('span:last-child').classList.add('text-green-600', 'bg-green-50');
+                            });
+                            
+                            // Ativa seleção
+                            slotBtn.classList.remove('bg-white', 'border-gray-200', 'hover:bg-gray-50');
+                            slotBtn.classList.add('bg-black', 'border-black', 'text-white');
+                            slotBtn.querySelector('span:first-child').classList.add('text-white');
+                            const badge = slotBtn.querySelector('span:last-child');
+                            badge.classList.remove('text-green-600', 'bg-green-50');
+                            badge.classList.add('bg-white/20', 'text-white');
+                            
+                            inputHora.value = timeStr + ":00";
+                            btnConfirmar.disabled = false;
+                        });
+
+                        slotsContainer.appendChild(slotBtn);
+                    });
+                }
+            });
+
+            if (!hasSlots) {
+                slotsContainer.innerHTML = '<p class="text-gray-400 text-sm text-center py-4">Nenhum horário disponível.</p>';
+            }
+        }
+
+        document.getElementById('prevMonth').addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth() - 1); renderCalendar(currentDate); });
+        document.getElementById('nextMonth').addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth() + 1); renderCalendar(currentDate); });
+        renderCalendar(currentDate);
+    </script>
+</body>
+</html>
