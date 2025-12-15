@@ -21,4 +21,6 @@ public interface ServicoRepository extends JpaRepository<Servico, Long> {
     // Método para validar disponibilidade do mecânico
     boolean existsByMecanicoAndDataAgendamentoAndHoraAgendamentoAndStatusNot(
             Mecanico mecanico, LocalDate data, LocalTime hora, String statusIgnorado);
+    
+    
 }

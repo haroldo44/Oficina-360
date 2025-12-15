@@ -75,9 +75,17 @@
             </div>
 
             <!-- DESCRIÇÃO DO CLIENTE (Leitura) -->
+            <!-- CORREÇÃO AQUI: Adicionado o TÍTULO em negrito antes da descrição -->
             <div class="bg-gray-600 text-white px-4 py-2 font-medium text-sm">Informação descrita por cliente</div>
-            <div class="border border-t-0 border-gray-300 p-4 text-sm mb-6 text-gray-700" th:text="${servico.descricao}">
-                Descrição do problema relatado pelo cliente...
+            <div class="border border-t-0 border-gray-300 p-4 text-sm mb-6 text-gray-700">
+                <div class="mb-2">
+                    <span class="font-bold text-black block mb-1">Título do Problema:</span>
+                    <span th:text="${servico.titulo} ?: 'Sem título informado'" class="text-gray-900 font-semibold">Título do Problema</span>
+                </div>
+                <div>
+                    <span class="font-bold text-black block mb-1">Descrição Detalhada:</span>
+                    <span th:text="${servico.descricao}">Descrição do problema relatado pelo cliente...</span>
+                </div>
             </div>
 
             <!-- DIAGNÓSTICO (Manual) -->

@@ -4,31 +4,38 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro - Etapa 3</title>
-    <link rel="stylesheet" th:href="@{/css/cadastro-etapa3.css}">
+    <link rel="stylesheet" th:href="@{/css/cadastro-etapa3-cliente.css}">
+    
+    <style>
+        /* Isso garante que a página ocupe 100% da altura do monitor */
+        html, body {
+            height: 100vh; 
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Isso pega o corpo da página e alinha tudo o que está dentro dele no centro absoluto */
+        body {
+            display: flex;
+            justify-content: center; /* Centraliza na horizontal */
+            align-items: center;     /* Centraliza na vertical */
+        }
+    </style>
 </head>
 
 <body>
 
-<!-- HEADER -->
-<header th:replace="~{fragments/header :: cabecalho}"></header>
-
-<!-- CONTEÚDO CENTRAL -->
 <div class="conteudo">
 
     <p class="titulo">Pegue o ID da oficina com o proprietário e digite abaixo</p>
 
-    <!-- Usa dto como objeto, igual ao controller -->
     <form th:action="@{/clientes/cadastro/etapa3}" th:object="${dto}" method="post">
         
-        <!-- Campo correto para o DTO: oficinaId -->
         <input type="text" th:field="*{oficinaId}" placeholder="Digite o ID da oficina" required>
         
         <button type="submit" class="btn-enviar">Adicionar oficina</button>
     </form>
 
 </div>
-
-<!-- FOOTER -->
-<footer th:replace="~{fragments/footer :: rodape}"></footer>
 </body>
 </html>

@@ -5,17 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel do Mecânico</title>
     
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Fonte Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Ícones -->
     <script src="https://unpkg.com/lucide@latest"></script>
     
-    <!-- CSS -->
-	<link rel="stylesheet" th:href="@{/css/mecanico-home.css}">
+    <link rel="stylesheet" th:href="@{/css/mecanico-home.css}">
 </head>
 <body class="flex flex-col min-h-screen">
 
@@ -23,7 +19,6 @@
 
     <main class="flex-grow w-full max-w-[1600px] mx-auto p-8 grid grid-cols-1 lg:grid-cols-2 gap-10">
 
-        <!-- PAINEL 1: SERVIÇOS AGENDADOS -->
         <section class="card-painel">
             <div class="flex justify-between items-start mb-6 border-b border-gray-100 pb-4">
                 <h2 class="text-xl font-bold text-gray-800">Serviços agendados</h2>
@@ -51,7 +46,6 @@
                     Nenhum serviço agendado para esta data.
                 </p>
 
-                <!-- ITEM CLICKÁVEL QUE ABRE O MODAL PENDENTE -->
                 <div class="service-item" th:each="servico : ${servicosAgendados}"
                      th:onclick="openServiceModal(
                         [[${servico.id}]], 
@@ -78,7 +72,6 @@
             </div>
         </section>
 
-        <!-- PAINEL 2: SERVIÇOS FINALIZADOS -->
         <section class="card-painel">
             <div class="flex justify-between items-start mb-6 border-b border-gray-100 pb-4">
                 <h2 class="text-xl font-bold text-gray-800">Serviços finalizados</h2>
@@ -106,8 +99,6 @@
                     Nenhum serviço encontrado para esta data.
                 </p>
                 
-                <!-- ITEM CLICKÁVEL QUE ABRE O MODAL FINALIZADO -->
-                <!-- Nota: dataFinalizacao é o campo que adicionamos à classe Servico -->
                 <div class="service-item" th:each="servico : ${servicosRealizados}"
                      th:onclick="openFinishedModal(
                         [[${servico.id}]], 
@@ -144,7 +135,6 @@
         </div>
     </div>
 
-    <!-- MODAL DE SERVIÇO PENDENTE -->
     <div id="serviceModal" class="modal-overlay">
         <div class="modal-content relative">
             <div class="flex items-center gap-3 mb-4">
@@ -184,7 +174,6 @@
         </div>
     </div>
 
-    <!-- MODAL DE SERVIÇO FINALIZADO/CANCELADO (ADICIONADO AGORA) -->
     <div id="finishedModal" class="modal-overlay">
         <div class="modal-content relative">
             <div class="flex items-center gap-3 mb-4">
@@ -198,7 +187,6 @@
             </div>
 
             <div class="space-y-3 mb-6">
-                <!-- Informações básicas -->
                 <div>
                     <p class="text-xs font-bold text-gray-500 uppercase">Cliente</p>
                     <p class="text-sm font-semibold" id="modalFinishedDetalhe">Nome</p>
@@ -213,7 +201,6 @@
                     <p class="text-sm text-gray-600" id="modalFinishedDescricao">...</p>
                 </div>
                 
-                <!-- Datas: Início e Fim -->
                 <div class="grid grid-cols-2 gap-4 mt-4">
                     <div>
                         <p class="text-xs font-bold text-gray-500 uppercase">Data de Agendamento</p>
@@ -225,7 +212,6 @@
                     </div>
                 </div>
                 
-                <!-- Status -->
                 <div class="mt-2">
                     <span id="modalFinishedStatus" class="text-xs font-bold px-2 py-1 rounded-full">STATUS</span>
                 </div>
@@ -233,7 +219,8 @@
 
             <div class="flex justify-between border-t border-gray-100 pt-4">
                 <button onclick="closeFinishedModal()" class="text-gray-500 font-semibold hover:text-gray-700 px-4 py-2">Cancelar</button>
-                <button onclick="baixarComprovanteSimulado()" class="bg-gray-800 text-white px-4 py-2 rounded font-semibold hover:bg-black text-sm">
+                
+                <button onclick="baixarComprovante()" class="bg-gray-800 text-white px-4 py-2 rounded font-semibold hover:bg-black text-sm">
                     Baixar formulário
                 </button>
             </div>
@@ -246,6 +233,9 @@
         const calendarState = { 'Agendados': { year: now.getFullYear(), month: now.getMonth() }, 'Finalizados': { year: now.getFullYear(), month: now.getMonth() } };
         const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
         let busyMap = { 'Agendados': {}, 'Finalizados': {} };
+        
+        // CORREÇÃO AQUI: Variável para guardar o ID selecionado
+        let currentFinishedServiceId = null; 
 
         // --- MODAL PENDENTE ---
         function openServiceModal(id, nome, telefone, descricao, titulo, data, foto) {
@@ -267,8 +257,11 @@
             document.getElementById('serviceModal').classList.remove('open');
         }
 
-        // --- MODAL FINALIZADO/CANCELADO (JS) ---
+        // --- MODAL FINALIZADO/CANCELADO (JS ATUALIZADO) ---
         function openFinishedModal(id, nome, telefone, descricao, titulo, dataInicio, foto, dataFim, status) {
+            // CORREÇÃO AQUI: Salva o ID do serviço atual
+            currentFinishedServiceId = id; 
+
             document.getElementById('modalFinishedNome').innerText = nome;
             document.getElementById('modalFinishedDetalhe').innerText = nome;
             document.getElementById('modalFinishedTel').innerText = telefone;
@@ -291,15 +284,22 @@
             
             document.getElementById('finishedModal').classList.add('open');
         }
+
         function closeFinishedModal() {
             document.getElementById('finishedModal').classList.remove('open');
         }
-        function baixarComprovanteSimulado() {
-            alert("Simulação: Formulário baixado com sucesso!");
-            closeFinishedModal();
+
+        // CORREÇÃO AQUI: Função que redireciona para a URL do Controller
+        function baixarComprovante() {
+            if (currentFinishedServiceId) {
+                // Redireciona para o endpoint Java que inicia o download
+                window.location.href = `/servicos/${currentFinishedServiceId}/download`;
+            } else {
+                alert("Erro: ID do serviço não encontrado.");
+            }
         }
 
-        // --- CALENDÁRIOS ---
+        // --- CALENDÁRIOS (Sem Alterações) ---
         function extractDatesFromDOM(type) {
             const containerId = type === 'Agendados' ? 'listaAgendados' : 'listaFinalizados';
             const container = document.getElementById(containerId);

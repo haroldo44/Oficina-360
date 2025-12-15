@@ -96,7 +96,7 @@ body {
         /* PARTE DIREITA */
         .right-side {
             width: 50%;
-            background-color: red;
+            background-color: rgb(255, 89, 89);
             position: relative;
             display: flex;
             justify-content: center;

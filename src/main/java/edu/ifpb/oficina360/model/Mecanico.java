@@ -56,6 +56,9 @@ public class Mecanico {
 
 	@Column(name = "turno_tarde_fim", nullable = false)
 	private LocalTime turnoTardeFim;
+	
+	@Column(name = "ATIVO", nullable = false)
+	private Boolean ativo = true;
 
 	public Long getId() {
 		return id;
@@ -154,10 +157,18 @@ public class Mecanico {
 	public void setTurnoTardeFim(LocalTime turnoTardeFim) {
 		this.turnoTardeFim = turnoTardeFim;
 	}
+	
+	public Boolean getAtivo() {
+		return ativo;
+	}
+
+	public void setAtivo(Boolean ativo) {
+		this.ativo = ativo;
+	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(email, horaInicio, id, nomeArquivoFoto, nomeCompleto, numeroTelefone, oficina, senha,
+		return Objects.hash(ativo, email, horaInicio, id, nomeArquivoFoto, nomeCompleto, numeroTelefone, oficina, senha,
 				turnoManhaFim, turnoManhaInicio, turnoTardeFim, turnoTardeInicio);
 	}
 
@@ -170,8 +181,9 @@ public class Mecanico {
 		if (getClass() != obj.getClass())
 			return false;
 		Mecanico other = (Mecanico) obj;
-		return Objects.equals(email, other.email) && Objects.equals(horaInicio, other.horaInicio)
-				&& Objects.equals(id, other.id) && Objects.equals(nomeArquivoFoto, other.nomeArquivoFoto)
+		return ativo == other.ativo && Objects.equals(email, other.email)
+				&& Objects.equals(horaInicio, other.horaInicio) && Objects.equals(id, other.id)
+				&& Objects.equals(nomeArquivoFoto, other.nomeArquivoFoto)
 				&& Objects.equals(nomeCompleto, other.nomeCompleto)
 				&& Objects.equals(numeroTelefone, other.numeroTelefone) && Objects.equals(oficina, other.oficina)
 				&& Objects.equals(senha, other.senha) && Objects.equals(turnoManhaFim, other.turnoManhaFim)

@@ -33,6 +33,9 @@ public class Servico {
 
     @Column(name = "hora_agendamento")
     private LocalTime horaAgendamento;
+    
+    @Column
+    private Double preco;
 
     @ManyToOne
     @JoinColumn(name = "cliente_id")
@@ -45,6 +48,10 @@ public class Servico {
     @ManyToOne
     @JoinColumn(name = "mecanico_id")
     private Mecanico mecanico;
+    
+    @Column(name = "caminho_pdf", length = 500)
+    private String caminhoPdf;
+
 
     public Long getId() {
 		return id;
@@ -94,6 +101,14 @@ public class Servico {
 		this.dataFinalizacao = dataFinalizacao;
 	}
 
+	public Double getPreco() {
+		return preco;
+	}
+
+	public void setPreco(Double preco) {
+		this.preco = preco;
+	}
+
 	public LocalTime getHoraAgendamento() {
 		return horaAgendamento;
 	}
@@ -124,6 +139,14 @@ public class Servico {
 
 	public void setMecanico(Mecanico mecanico) {
 		this.mecanico = mecanico;
+	}
+
+	public String getCaminhoPdf() {
+		return caminhoPdf;
+	}
+
+	public void setCaminhoPdf(String caminhoPdf) {
+		this.caminhoPdf = caminhoPdf;
 	}
 
 	@Override

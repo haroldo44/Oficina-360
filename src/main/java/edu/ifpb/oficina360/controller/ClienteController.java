@@ -167,10 +167,14 @@ public class ClienteController {
 
         model.addAttribute("cliente", cliente);
         model.addAttribute("oficina", oficina);
+        
+        // --- CORREÇÃO AQUI: BUSCA APENAS SERVIÇOS DO CLIENTE LOGADO ---
+        // Antes estava buscando servicoService.buscarPorOficinaEStatus(oficina.getId(), ...) o que trazia TUDO da oficina
         model.addAttribute("servicosAgendados",
-                servicoService.buscarPorOficinaEStatus(oficina.getId(), "PENDENTE"));
+                servicoService.buscarPorClienteEStatus(cliente, "PENDENTE"));
         model.addAttribute("servicosFinalizados",
-                servicoService.buscarPorOficinaEStatus(oficina.getId(), "FINALIZADO"));
+                servicoService.buscarPorClienteEStatus(cliente, "FINALIZADO"));
+        // -------------------------------------------------------------
 
         return "clientes/tela-cliente";
     }

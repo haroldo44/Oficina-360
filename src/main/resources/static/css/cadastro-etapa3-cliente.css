@@ -5,17 +5,19 @@ body {
     background: #fff;
     color: #000;
     
+    /* CONFIGURAÇÃO DE CENTRALIZAÇÃO */
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
+    justify-content: center; /* Centraliza Verticalmente (Cima/Baixo) */
+    align-items: center;     /* Centraliza Horizontalmente (Esquerda/Direita) */
+    min-height: 100vh;       /* Garante que o body tenha a altura total da tela */
 }
+
 /* CONTEÚDO CENTRAL */
 .conteudo {
     width: 100%;
-    margin-top: 120px;
+    /* Removi margin-top: 120px e flex: 1 pois eles atrapalham a centralização automática */
     text-align: center;
-    flex: 1;
-    padding-bottom: 50px;
 }
 
 /* TÍTULO */
@@ -32,13 +34,13 @@ body {
     border-radius: 20px;
     outline: none;
     font-size: 16px;
-    display: block;          /* <-- garante que fica sozinho */
-    margin: 0 auto 25px auto; /* <-- centraliza e adiciona espaço abaixo */
+    display: block;          
+    margin: 0 auto 25px auto; 
 }
 
 /* BOTÃO */
 .btn-enviar {
-    width: 450px;
+    width: 450px; /* Mesma largura do input para ficar alinhado */
     padding: 12px;
     border: none;
     background: #262626;
@@ -46,6 +48,6 @@ body {
     border-radius: 8px;
     cursor: pointer;
     font-size: 15px;
-    display: block;           /* <-- impede alinhamento lateral */
-    margin: 0 auto;           /* <-- centraliza */
+    display: block;           
+    margin: 0 auto;           
 }

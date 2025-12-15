@@ -15,13 +15,16 @@
             
                 <div class="photo-container">
             		<label for="fotoClienteArquivo" class="circle-photo">
-                		<img th:src="@{/images/Perfil.png}" alt="Foto padrão">
+                        <img id="previewImagem" 
+                             th:src="@{/images/Perfil.png}" 
+                             alt="Foto padrão"
+                             style="object-fit: cover; width: 100%; height: 100%; border-radius: 50%;">
             		</label>
 
-            		<label for="fotoClienteArquivo" class="add-photo-text">Adicionar foto</label>
-            		<input type="file" id="fotoClienteArquivo" name="fotoClienteArquivo" accept="image/*">
+            		<label for="fotoClienteArquivo" class="add-photo-text" style="cursor: pointer;">Adicionar foto</label>
+            		
+                    <input type="file" id="fotoClienteArquivo" name="fotoClienteArquivo" accept="image/*" style="display: none;">
         		</div>
-        		
         		
                 <input type="text" th:field="*{nome}" placeholder="Digite seu nome completo" required>
                 <div th:if="${#fields.hasErrors('nome')}" class="text-danger">
@@ -46,5 +49,22 @@
         <img class="illustration" th:src="@{/images/Desenho da tela de login.png}" alt="Ilustração">
     </div>
 </div>
+
+<script>
+    document.getElementById('fotoClienteArquivo').addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                const img = document.getElementById('previewImagem');
+                img.src = e.target.result; // Atualiza a fonte da imagem para o arquivo selecionado
+            }
+            
+            reader.readAsDataURL(file); // Lê o arquivo como uma URL de dados
+        }
+    });
+</script>
+
 </body>
 </html>

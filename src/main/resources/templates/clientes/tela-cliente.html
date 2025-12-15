@@ -4,331 +4,333 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel do Cliente</title>
-    
-    <!-- Fonte Inter -->
+
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Ícones Lucide -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    
     <link rel="stylesheet" th:href="@{/css/tela-inicial-cliente.css}">
 </head>
 <body>
 
-    <header th:replace="~{fragments/header :: cabecalho}"></header>
+<header th:replace="~{fragments/header :: cabecalho}"></header>
 
-    <main class="main-container">
+<main class="main-container">
+
+    <aside class="shop-info-section">
+        <div class="shop-image-container">
+            <span class="label-img">Imagem da oficina</span>
+            <img th:src="@{'/uploads/' + ${oficina.imagem}}"
+                 class="shop-img"
+                 onerror="this.src='https://via.placeholder.com/350x220?text=Oficina'">
+        </div>
+
+        <div class="input-group">
+            <label>Nome</label>
+            <div class="fake-input" th:text="${oficina.nomeDaOficina}"></div>
+        </div>
+
+        <div class="id-field">ID: <span th:text="${oficina.id}"></span></div>
+
+        <div class="input-group desc-box">
+            <label>Descrição</label>
+            <textarea readonly 
+                      th:text="${oficina.descricao}"
+                      style="resize: none; 
+                             outline: none; 
+                             cursor: default; 
+                             pointer-events: none; 
+                             border: 1px solid #ccc; 
+                             border-radius: 15px; 
+                             background: #f9f9f9; 
+                             padding: 10px; 
+                             box-shadow: none; 
+                             width: 100%;">
+            </textarea>
+        </div>
+    </aside>
+
+    <section class="services-section">
+
+        <div th:if="${sucesso}" class="alert-success" th:text="${sucesso}"></div>
+        <div th:if="${erro}" class="alert-error" th:text="${erro}"></div>
+
+        <div class="services-columns">
+
+            <div class="service-col">
+                <h3>Serviços agendados</h3>
+
+                <div class="service-card card-clickable"
+                     th:each="s : ${servicosAgendados}"
+                     th:attr="
+                        data-id=${s.id},
+                        data-titulo=${s.titulo},
+                        data-descricao=${s.descricao},
+                        data-mecanico=${s.mecanico != null ? s.mecanico.nomeCompleto : 'Não atribuído'},
+                        data-foto=${s.mecanico != null ? s.mecanico.nomeArquivoFoto : ''}
+                     ">
+                    <div class="service-header">
+                        <span class="service-title">
+                            <span class="star-icon">☆</span>
+                            <span th:text="${s.titulo}"></span>
+                        </span>
+                        <span class="service-status status-pendente">Pendente</span>
+                    </div>
+                    <p class="service-desc" th:text="${s.descricao}"></p>
+                </div>
+
+                <p th:if="${#lists.isEmpty(servicosAgendados)}" class="empty-text">
+                    Nenhum serviço agendado.
+                </p>
+            </div>
+
+            <div class="service-col">
+                <h3>Serviços finalizados</h3>
+
+                <div class="service-card card-finished"
+                     th:each="s : ${servicosFinalizados}"
+                     th:onclick="openFinishedModal(
+                        [[${s.id}]],
+                        [[${s.cliente.nome}]],
+                        [[${s.cliente.contato}]],
+                        [[${s.cliente.foto}]],
+                        [[${s.titulo}]],
+                        [[${s.descricao}]],
+                        [[${s.mecanico != null ? s.mecanico.nomeCompleto : 'Não atribuído'}]],
+                        [[${#temporals.format(s.dataAgendamento,'dd/MM/yyyy')}]],
+                        [[${s.dataFinalizacao != null ? #temporals.format(s.dataFinalizacao, 'dd/MM/yyyy') : 'N/A'}]],
+                        [[${s.oficina.nomeDaOficina}]],
+                        [[${s.oficina.cnpj}]]
+                     )">
+
+                    <div class="service-header">
+                        <span class="service-title">
+                            <span class="star-icon">★</span>
+                            <span th:text="${s.titulo}"></span>
+                        </span>
+                        <span class="service-status status-finalizado">Finalizado</span>
+                    </div>
+                    <p class="service-desc" th:text="${s.descricao}"></p>
+                </div>
+
+                <p th:if="${#lists.isEmpty(servicosFinalizados)}" class="empty-text">
+                    Nenhum histórico recente.
+                </p>
+            </div>
+
+        </div>
+
+        <div class="action-buttons">
+            <button class="btn btn-urgencia">Urgência</button>
+            <a th:href="@{/clientes/solicitar-servico/{id}(id=${cliente.id})}" class="btn btn-solicitar">
+                Solicitar serviço
+            </a>
+        </div>
+
+    </section>
+</main>
+
+<footer th:replace="~{fragments/footer :: rodape}"></footer>
+
+<div id="serviceModal" class="modal-overlay">
+    <div class="modal-box">
+        <h2 class="modal-title">SERVIÇO PENDENTE</h2>
+
+        <div class="mechanic-info">
+            <img id="modalMecanicoFoto" src="" alt="Mecânico" class="mechanic-photo">
+            <div class="mechanic-details">
+                <p>Mecânico</p>
+                <h4 id="modalMecanicoNome"></h4>
+                <p>Protocolo: <span id="modalProtocolo"></span></p>
+            </div>
+        </div>
+
+        <div class="service-info-block">
+            <span class="info-label">Informações do serviço</span>
+            <span class="info-label" style="margin-top: 10px; color: #333;">Problema</span>
+            <span id="modalProblema" class="info-value"></span>
+            
+            <span class="info-label" style="margin-top: 15px; color: #333;">Descrição</span>
+            <div id="modalDescricao" class="info-desc"></div>
+        </div>
+
+        <div class="modal-buttons">
+            <button class="btn-modal btn-red" onclick="closeServiceModal()">Sair</button>
+            <button class="btn-modal btn-black" onclick="openConfirmModal()">Cancelar agendamento</button>
+        </div>
+    </div>
+</div>
+
+<div id="confirmModal" class="modal-overlay">
+    <div class="modal-box confirm-box">
+        <div style="margin-bottom: 20px; color: #ea1d2c;">
+            <i data-lucide="alert-circle" width="48" height="48" style="margin: 0 auto;"></i>
+        </div>
+        <h2 class="modal-title" style="margin-bottom: 15px;">Confirmar Cancelamento</h2>
+        <p class="confirm-text">Tem certeza que deseja cancelar este agendamento? Esta ação não pode ser desfeita.</p>
+
+        <form id="formCancelar" action="" method="post">
+            <div class="modal-buttons" style="justify-content: center;">
+                <button type="button" class="btn-modal btn-red" onclick="closeConfirmModal()">Sair</button>
+                <button type="submit" class="btn-modal btn-black">Confirmar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="finishedModal" class="modal-overlay">
+    <div class="modal-box">
+        <h2 class="modal-title" style="margin-bottom: 20px;">ORDEM DE SERVIÇO FINALIZADO</h2>
+
+        <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 20px;">
+            <img id="modalFinClienteFoto" src="" class="mechanic-photo" style="width: 60px; height: 60px; border: none;">
+            <div>
+                <p style="font-size: 12px; color: #666; margin-bottom: 2px;">Cliente</p>
+                <h4 id="modalFinClienteNome" style="font-size: 16px; font-weight: 700; color: #111;"></h4>
+                <p id="modalFinClienteTel" style="font-size: 13px; color: #555;"></p>
+                <p style="font-size: 13px; color: #555;">Protocolo <span id="modalFinProtocolo"></span></p>
+            </div>
+        </div>
+
+        <h3 style="font-size: 14px; font-weight: 700; color: #111; margin-bottom: 10px;">Informações do serviço</h3>
         
-        <!-- ESQUERDA: INFO DA OFICINA -->
-        <aside class="shop-info-section">
-            <div class="shop-image-container">
-                <span class="label-img">Imagem da oficina</span>
-                <img th:src="@{'/uploads/' + ${oficina.imagem}}" alt="Fachada da oficina" class="shop-img"
-                     onerror="this.src='https://via.placeholder.com/350x220?text=Oficina'">
+        <div style="margin-bottom: 10px;">
+            <p style="font-size: 12px; font-weight: 600; color: #333;">Problema</p>
+            <p id="modalFinTitulo" style="font-size: 14px; color: #555;"></p>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <p style="font-size: 12px; font-weight: 600; color: #333;">Descrição</p>
+            <p id="modalFinDescricao" style="font-size: 13px; color: #555; line-height: 1.4;"></p>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <p style="font-size: 12px; font-weight: 600; color: #333;">Mecânico</p>
+            <p id="modalFinMecanico" style="font-size: 14px; color: #555;"></p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+            <div>
+                <p style="font-size: 12px; font-weight: 600; color: #333;">Data de início</p>
+                <p id="modalFinDataInicio" style="font-size: 14px; color: #555;"></p>
             </div>
-            <div class="input-group">
-                <label>Nome</label>
-                <div class="fake-input" th:text="${oficina.nomeDaOficina}">Nome da Oficina</div>
-            </div>
-            <div class="id-field">ID: <span th:text="${oficina.id}"></span></div>
-            <div class="input-group desc-box">
-                <label>Descrição</label>
-                <textarea readonly th:text="${oficina.descricao}"></textarea>
-            </div>
-        </aside>
-
-        <!-- DIREITA: SERVIÇOS E AÇÕES -->
-        <section class="services-section">
-            
-            <div th:if="${sucesso}" class="alert-success">
-                <span th:text="${sucesso}"></span>
-            </div>
-            <div th:if="${erro}" class="alert-error">
-                <span th:text="${erro}"></span>
-            </div>
-            
-            <div class="services-columns">
-                
-                <!-- Coluna Agendados (Clicáveis) -->
-                <div class="service-col">
-                    <h3>Serviços agendados</h3>
-                    
-                    <div class="service-card card-clickable" 
-                         th:each="s : ${servicosAgendados}"
-                         th:attr="data-id=${s.id}, 
-                                  data-titulo=${s.titulo}, 
-                                  data-descricao=${s.descricao}, 
-                                  data-mecanico=${s.mecanico != null ? s.mecanico.nomeCompleto : 'Não atribuído'}, 
-                                  data-foto=${s.mecanico != null ? s.mecanico.nomeArquivoFoto : ''}">
-                        
-                        <div class="service-header">
-                            <span class="service-title">
-                                <span class="star-icon">☆</span>
-                                <span th:text="${s.titulo}">Troca de óleo</span>
-                            </span>
-                            <span class="service-status status-pendente">Pendente</span>
-                        </div>
-                        <p class="service-desc" th:text="${s.descricao}">Descrição...</p>
-                    </div>
-
-                    <p th:if="${#lists.isEmpty(servicosAgendados)}" style="color:#999; font-size:13px; margin-top:10px;">
-                        Nenhum serviço agendado.
-                    </p>
-                </div>
-
-                <!-- Coluna Finalizados (AGORA CLICÁVEIS) -->
-                <div class="service-col">
-                    <h3>Serviços finalizados</h3>
-                    
-                    <!-- Adicionado evento onclick e classe card-finished -->
-                    <div class="service-card card-finished" 
-                         th:each="s : ${servicosFinalizados}"
-                         th:onclick="openFinishedModal(
-                            [[${s.id}]], 
-                            [[${s.cliente.nome}]], 
-                            [[${s.cliente.contato}]], 
-                            [[${s.cliente.foto}]],
-                            [[${s.titulo}]], 
-                            [[${s.descricao}]], 
-                            [[${s.mecanico != null ? s.mecanico.nomeCompleto : 'Mecânico não atribuído'}]], 
-                            [[${#temporals.format(s.dataAgendamento, 'dd/MM/yyyy')}]],
-                            [[${s.dataFinalizacao != null ? #temporals.format(s.dataFinalizacao, 'dd/MM/yyyy') : 'N/A'}]],
-                            [[${s.oficina.nomeDaOficina}]],
-                            [[${s.oficina.cnpj}]]
-                         )">
-                        <div class="service-header">
-                            <span class="service-title">
-                                <span class="star-icon">★</span>
-                                <span th:text="${s.titulo}">Balanceamento</span>
-                            </span>
-                            <span class="service-status status-finalizado">Finalizado</span>
-                        </div>
-                        <p class="service-desc" th:text="${s.descricao}">Descrição...</p>
-                    </div>
-
-                    <p th:if="${#lists.isEmpty(servicosFinalizados)}" style="color:#999; font-size:13px; margin-top:10px;">
-                        Nenhum histórico recente.
-                    </p>
-                </div>
-
-            </div>
-
-            <div class="action-buttons">
-                <button class="btn btn-urgencia">Urgência</button>
-                <a th:href="@{/clientes/solicitar-servico/{id}(id=${cliente.id})}" class="btn btn-solicitar">Solicitar serviço</a>
-            </div>
-
-        </section>
-
-    </main>
-
-    <footer th:replace="~{fragments/footer :: rodape}"></footer>
-
-    <!-- =========================================
-         MODAL 1: DETALHES DO SERVIÇO (PENDENTE)
-         ========================================= -->
-    <div id="serviceModal" class="modal-overlay">
-        <div class="modal-box">
-            <h2 class="modal-title">SERVIÇO PENDENTE</h2>
-
-            <div class="mechanic-info">
-                <img id="modalMecanicoFoto" src="" alt="Mecânico" class="mechanic-photo">
-                <div class="mechanic-details">
-                    <p>Mecânico</p>
-                    <h4 id="modalMecanicoNome"></h4>
-                    <p>Protocolo: <span id="modalProtocolo"></span></p>
-                </div>
-            </div>
-
-            <div class="service-info-block">
-                <span class="info-label">Informações do serviço</span>
-                <span class="info-label" style="margin-top: 10px; color: #333;">Problema</span>
-                <span id="modalProblema" class="info-value"></span>
-                
-                <span class="info-label" style="margin-top: 15px; color: #333;">Descrição</span>
-                <div id="modalDescricao" class="info-desc"></div>
-            </div>
-
-            <div class="modal-buttons">
-                <button class="btn-modal btn-red" onclick="closeServiceModal()">Sair</button>
-                <button class="btn-modal btn-black" onclick="openConfirmModal()">Cancelar agendamento</button>
+            <div>
+                <p style="font-size: 12px; font-weight: 600; color: #333;">Data de finalização</p>
+                <p id="modalFinDataFim" style="font-size: 14px; color: #555;"></p>
             </div>
         </div>
-    </div>
 
-    <!-- =========================================
-         MODAL 2: CONFIRMAÇÃO DE CANCELAMENTO
-         ========================================= -->
-    <div id="confirmModal" class="modal-overlay">
-        <div class="modal-box confirm-box">
-            <div style="margin-bottom: 20px; color: #ea1d2c;">
-                <i data-lucide="alert-circle" width="48" height="48" style="margin: 0 auto;"></i>
-            </div>
-            <h2 class="modal-title" style="margin-bottom: 15px;">Confirmar Cancelamento</h2>
-            <p class="confirm-text">Tem certeza que deseja cancelar este agendamento? Esta ação não pode ser desfeita.</p>
+        <div style="margin-bottom: 20px; padding-top: 10px; border-top: 1px solid #eee;">
+            <p id="modalFinOficina" style="font-size: 14px; font-weight: 700; color: #111;"></p>
+            <p style="font-size: 12px; color: #666;">CNPJ <span id="modalFinCnpj"></span></p>
+        </div>
 
-            <form id="formCancelar" action="" method="post">
-                <div class="modal-buttons" style="justify-content: center;">
-                    <button type="button" class="btn-modal btn-red" onclick="closeConfirmModal()">Sair</button>
-                    <button type="submit" class="btn-modal btn-black">Confirmar</button>
-                </div>
-            </form>
+        <div class="modal-buttons" style="align-items: center;">
+            <button class="btn-modal" style="background: transparent; color: #666;" onclick="closeFinishedModal()">Cancelar</button>
+            <button class="btn-modal btn-black" onclick="baixarComprovante()">Baixar comprovante</button>
         </div>
     </div>
+</div>
 
-    <!-- =========================================
-         MODAL 3: SERVIÇO FINALIZADO (ATUALIZADO)
-         ========================================= -->
-    <div id="finishedModal" class="modal-overlay">
-        <div class="modal-box">
-            <h2 class="modal-title" style="margin-bottom: 20px;">ORDEM DE SERVIÇO FINALIZADO</h2>
+<script>
+    lucide.createIcons();
 
-            <!-- Client Info Block (Top) -->
-            <div style="display: flex; gap: 15px; align-items: center; margin-bottom: 20px;">
-                <img id="modalFinClienteFoto" src="" class="mechanic-photo" style="width: 60px; height: 60px; border: none;">
-                <div>
-                    <p style="font-size: 12px; color: #666; margin-bottom: 2px;">Cliente</p>
-                    <h4 id="modalFinClienteNome" style="font-size: 16px; font-weight: 700; color: #111;"></h4>
-                    <p id="modalFinClienteTel" style="font-size: 13px; color: #555;"></p>
-                    <p style="font-size: 13px; color: #555;">Protocolo <span id="modalFinProtocolo"></span></p>
-                </div>
-            </div>
+    let currentServiceId = null;
 
-            <!-- Service Info -->
-            <h3 style="font-size: 14px; font-weight: 700; color: #111; margin-bottom: 10px;">Informações do serviço</h3>
-            
-            <div style="margin-bottom: 10px;">
-                <p style="font-size: 12px; font-weight: 600; color: #333;">Problema</p>
-                <p id="modalFinTitulo" style="font-size: 14px; color: #555;"></p>
-            </div>
-
-            <div style="margin-bottom: 15px;">
-                <p style="font-size: 12px; font-weight: 600; color: #333;">Descrição</p>
-                <p id="modalFinDescricao" style="font-size: 13px; color: #555; line-height: 1.4;"></p>
-            </div>
-
-            <div style="margin-bottom: 15px;">
-                <p style="font-size: 12px; font-weight: 600; color: #333;">Mecânico</p>
-                <p id="modalFinMecanico" style="font-size: 14px; color: #555;"></p>
-            </div>
-
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
-                <div>
-                    <p style="font-size: 12px; font-weight: 600; color: #333;">Data de início</p>
-                    <p id="modalFinDataInicio" style="font-size: 14px; color: #555;"></p>
-                </div>
-                <div>
-                    <p style="font-size: 12px; font-weight: 600; color: #333;">Data de finalização</p>
-                    <p id="modalFinDataFim" style="font-size: 14px; color: #555;"></p>
-                </div>
-            </div>
-
-            <!-- Workshop Info Bottom -->
-            <div style="margin-bottom: 20px; padding-top: 10px; border-top: 1px solid #eee;">
-                <p id="modalFinOficina" style="font-size: 14px; font-weight: 700; color: #111;"></p>
-                <p style="font-size: 12px; color: #666;">CNPJ <span id="modalFinCnpj"></span></p>
-            </div>
-
-            <!-- Buttons -->
-            <div class="modal-buttons" style="align-items: center;">
-                <button class="btn-modal" style="background: transparent; color: #666;" onclick="closeFinishedModal()">Cancelar</button>
-                <button class="btn-modal btn-black" onclick="baixarComprovante()">Baixar comprovante</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        lucide.createIcons();
-
-        let currentServiceId = null;
-
-        // Listener para os serviços PENDENTES
-        document.querySelectorAll('.card-clickable').forEach(card => {
-            card.addEventListener('click', function() {
-                const id = this.getAttribute('data-id');
-                const titulo = this.getAttribute('data-titulo');
-                const descricao = this.getAttribute('data-descricao');
-                const mecanico = this.getAttribute('data-mecanico');
-                const foto = this.getAttribute('data-foto');
-
-                openServiceModal(id, titulo, descricao, mecanico, foto);
-            });
+    // Listener para os cards de serviço pendente
+    document.querySelectorAll('.card-clickable').forEach(card => {
+        card.addEventListener('click', function () {
+            openServiceModal(
+                this.dataset.id,
+                this.dataset.titulo,
+                this.dataset.descricao,
+                this.dataset.mecanico,
+                this.dataset.foto
+            );
         });
+    });
 
-        // Função para abrir modal de serviço PENDENTE
-        function openServiceModal(id, titulo, descricao, mecanicoNome, mecanicoFoto) {
-            currentServiceId = id;
+    // Modal Pendente
+    function openServiceModal(id, titulo, descricao, mecanico, foto) {
+        currentServiceId = id; 
 
-            document.getElementById('modalProtocolo').innerText = id;
-            document.getElementById('modalProblema').innerText = titulo;
-            document.getElementById('modalDescricao').innerText = descricao;
-            document.getElementById('modalMecanicoNome').innerText = mecanicoNome;
+        document.getElementById('modalProtocolo').innerText = id;
+        document.getElementById('modalProblema').innerText = titulo;
+        document.getElementById('modalDescricao').innerText = descricao;
+        document.getElementById('modalMecanicoNome').innerText = mecanico;
 
-            const imgEl = document.getElementById('modalMecanicoFoto');
-            if (mecanicoFoto && mecanicoFoto !== 'null' && mecanicoFoto !== '') {
-                imgEl.src = '/uploads/' + mecanicoFoto;
-            } else {
-                imgEl.src = '/images/Perfil.png'; // Caminho da imagem padrão
-            }
-
-            document.getElementById('serviceModal').classList.add('active');
+        const imgEl = document.getElementById('modalMecanicoFoto');
+        if (foto && foto !== 'null' && foto !== '') {
+            imgEl.src = '/uploads/' + foto;
+        } else {
+            imgEl.src = '/images/Perfil.png';
         }
 
-        function closeServiceModal() {
-            document.getElementById('serviceModal').classList.remove('active');
+        document.getElementById('serviceModal').classList.add('active');
+    }
+
+    function closeServiceModal() {
+        document.getElementById('serviceModal').classList.remove('active');
+    }
+
+    // Modal Cancelar
+    function openConfirmModal() {
+        closeServiceModal();
+        const form = document.getElementById('formCancelar');
+        form.action = '/clientes/servicos/cancelar/' + currentServiceId; 
+        document.getElementById('confirmModal').classList.add('active');
+    }
+
+    function closeConfirmModal() {
+        document.getElementById('confirmModal').classList.remove('active');
+    }
+
+    // Modal Finalizado
+    function openFinishedModal(
+        id, clienteNome, clienteTel, clienteFoto,
+        titulo, descricao, mecanico,
+        dataInicio, dataFim, oficina, cnpj
+    ) {
+        currentServiceId = id;
+
+        document.getElementById('modalFinClienteNome').innerText = clienteNome;
+        document.getElementById('modalFinClienteTel').innerText = clienteTel;
+        document.getElementById('modalFinProtocolo').innerText = id;
+        
+        // Info Serviço
+        document.getElementById('modalFinTitulo').innerText = titulo;
+        document.getElementById('modalFinDescricao').innerText = descricao;
+        document.getElementById('modalFinMecanico').innerText = mecanico;
+        
+        // Datas
+        document.getElementById('modalFinDataInicio').innerText = dataInicio;
+        document.getElementById('modalFinDataFim').innerText = dataFim;
+        
+        // Oficina
+        document.getElementById('modalFinOficina').innerText = oficina;
+        document.getElementById('modalFinCnpj').innerText = cnpj;
+
+        // Foto Cliente
+        const imgEl = document.getElementById('modalFinClienteFoto');
+        if (clienteFoto && clienteFoto !== 'null' && clienteFoto !== '') {
+            imgEl.src = '/uploads/' + clienteFoto;
+        } else {
+            imgEl.src = '/images/Perfil.png';
         }
 
-        // Função para abrir modal de serviço FINALIZADO (UPDATED)
-        function openFinishedModal(id, clienteNome, clienteTel, clienteFoto, titulo, descricao, mecanicoNome, dataInicio, dataFim, oficinaNome, oficinaCnpj) {
-            // Client
-            document.getElementById('modalFinClienteNome').innerText = clienteNome;
-            document.getElementById('modalFinClienteTel').innerText = clienteTel;
-            document.getElementById('modalFinProtocolo').innerText = id;
-            
-            const imgEl = document.getElementById('modalFinClienteFoto');
-            if (clienteFoto && clienteFoto !== 'null' && clienteFoto !== '') {
-                imgEl.src = '/uploads/' + clienteFoto;
-            } else {
-                imgEl.src = '/images/Perfil.png';
-            }
+        document.getElementById('finishedModal').classList.add('active');
+    }
 
-            // Service
-            document.getElementById('modalFinTitulo').innerText = titulo;
-            document.getElementById('modalFinDescricao').innerText = descricao;
-            document.getElementById('modalFinMecanico').innerText = mecanicoNome;
-            
-            // Dates
-            document.getElementById('modalFinDataInicio').innerText = dataInicio;
-            document.getElementById('modalFinDataFim').innerText = dataFim;
+    function closeFinishedModal() {
+        document.getElementById('finishedModal').classList.remove('active');
+    }
 
-            // Workshop
-            document.getElementById('modalFinOficina').innerText = oficinaNome;
-            document.getElementById('modalFinCnpj').innerText = oficinaCnpj;
-
-            document.getElementById('finishedModal').classList.add('active');
+    function baixarComprovante() {
+        if (!currentServiceId) {
+            alert("Serviço inválido.");
+            return;
         }
-
-        function closeFinishedModal() {
-            document.getElementById('finishedModal').classList.remove('active');
-        }
-
-        // Função simulada de baixar comprovante
-        function baixarComprovante() {
-            alert("Download do comprovante iniciado... (Simulação)");
-            closeFinishedModal();
-        }
-
-        function openConfirmModal() {
-            closeServiceModal();
-            const form = document.getElementById('formCancelar');
-            form.action = '/clientes/servicos/cancelar/' + currentServiceId; 
-            document.getElementById('confirmModal').classList.add('active');
-        }
-
-        function closeConfirmModal() {
-            document.getElementById('confirmModal').classList.remove('active');
-        }
-    </script>
+        window.location.href = `/servicos/${currentServiceId}/download`;
+    }
+</script>
 
 </body>
 </html>

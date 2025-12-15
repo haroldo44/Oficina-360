@@ -288,4 +288,27 @@ label[for="editFotoMecanico"] img {
   object-fit: cover;
 }
 
+.btn-ativar {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn-desativar {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+/* Card desativado */
+.card-mecanico.inativo {
+    opacity: 0.5;
+    filter: grayscale(100%);
+}
 

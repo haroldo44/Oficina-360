@@ -74,7 +74,7 @@ body {
     /* Lado vermelho */
     .right {
         width: 50%;
-        background: #ff0000;
+        background: #FF5959;
         display: flex;
         justify-content: center;
         align-items: center;

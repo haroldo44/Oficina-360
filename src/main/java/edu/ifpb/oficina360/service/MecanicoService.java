@@ -84,9 +84,14 @@ public class MecanicoService {
         return mecanicoRepository.save(mecanico);
     }
 
+    public List<Mecanico> buscarMecanicosAtivosPorOficina(Long oficinaId) {
+        return mecanicoRepository.findByOficinaIdAndAtivoTrue(oficinaId);
+    }
+    
     public List<Mecanico> buscarMecanicosPorOficina(Long oficinaId) {
         return mecanicoRepository.findByOficinaId(oficinaId);
     }
+
 
     public void removerMecanico(Long mecanicoId) {
         mecanicoRepository.deleteById(mecanicoId);
@@ -127,5 +132,13 @@ public class MecanicoService {
     
     public Mecanico buscarPorEmail(String email) {
         return mecanicoRepository.findByEmail(email).orElse(null);
+    }
+    
+    public void alternarStatus(Long mecanicoId) {
+        Mecanico mecanico = mecanicoRepository.findById(mecanicoId)
+            .orElseThrow(() -> new RuntimeException("Mecânico não encontrado"));
+
+        mecanico.setAtivo(!mecanico.getAtivo());
+        mecanicoRepository.save(mecanico);
     }
 }
