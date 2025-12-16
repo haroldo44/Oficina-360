@@ -1,7 +1,6 @@
 package edu.ifpb.oficina360.controller;
 
 import java.io.File;
-
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -20,28 +19,36 @@ import edu.ifpb.oficina360.model.Cliente;
 import edu.ifpb.oficina360.model.ClienteCadastroDTO;
 import edu.ifpb.oficina360.model.Oficina;
 import edu.ifpb.oficina360.repository.ClienteRepository;
+import edu.ifpb.oficina360.repository.MecanicoRepository; // Importe o Repo Mecanico
+import edu.ifpb.oficina360.repository.OficinaRepository; // Importe o Repo Oficina
 import edu.ifpb.oficina360.service.ClienteService;
 import edu.ifpb.oficina360.service.OficinaService;
 import edu.ifpb.oficina360.service.ServicoService;
 import jakarta.servlet.http.HttpSession;
-import jakarta.validation.Valid;
+// Removi o import do @Valid pois faremos manualmente
 
 @Controller
 @RequestMapping("/clientes")
 public class ClienteController {
 
-	@Autowired 
-	private ClienteService clienteService;
-	
-    @Autowired 
+    @Autowired
+    private ClienteService clienteService;
+
+    @Autowired
     private OficinaService oficinaService;
-    
-    @Autowired 
+
+    @Autowired
     private ServicoService servicoService;
-    
-    @Autowired 
+
+    @Autowired
     private ClienteRepository clienteRepository;
-    
+
+    @Autowired
+    private OficinaRepository oficinaRepository; // Injeção da Oficina
+
+    @Autowired
+    private MecanicoRepository mecanicoRepository; // Injeção do Mecanico
+
 
     // ETAPA 1
     @GetMapping("/cadastro/etapa1")
@@ -53,14 +60,33 @@ public class ClienteController {
     }
 
     @PostMapping("/cadastro/etapa1")
-    public String salvarEtapa1(@ModelAttribute("dto") @Valid ClienteCadastroDTO dto,
+    public String salvarEtapa1(@ModelAttribute("dto") ClienteCadastroDTO dto, // SEM @Valid aqui
                                BindingResult result,
                                HttpSession session) {
 
+        if (dto.getEmail() == null || dto.getEmail().trim().isEmpty()) {
+            result.rejectValue("email", "erro", "O e-mail é obrigatório.");
+        }
+        if (dto.getSenha() == null || dto.getSenha().trim().isEmpty()) {
+            result.rejectValue("senha", "erro", "A senha é obrigatória.");
+        }
+
+        if (dto.getEmail() != null && !dto.getEmail().isEmpty()) {
+            boolean emailExiste = clienteRepository.existsByEmail(dto.getEmail()) ||
+                                  oficinaRepository.existsByEmail(dto.getEmail()) ||
+                                  mecanicoRepository.existsByEmail(dto.getEmail());
+
+            if (emailExiste) {
+                result.rejectValue("email", "erro", "Este e-mail já está em uso.");
+            }
+        }
+
+        // Se tiver erro (vazio ou duplicado), volta
         if (result.hasErrors()) {
             return "clientes/cadastro-etapa1";
         }
 
+        // --- 3. CONFIRMAÇÃO DE SENHA ---
         if (!dto.getSenha().equals(dto.getConfirmarSenha())) {
             result.rejectValue("confirmarSenha", null, "As senhas não conferem.");
             return "clientes/cadastro-etapa1";
@@ -70,7 +96,7 @@ public class ClienteController {
         return "redirect:/clientes/cadastro/etapa2";
     }
 
-    // ETAPA 2 - salva arquivo temporário e guarda apenas o nome na sessão
+    // ETAPA 2
     @GetMapping("/cadastro/etapa2")
     public String etapa2(HttpSession session, Model model) {
         ClienteCadastroDTO dto = (ClienteCadastroDTO) session.getAttribute("cadastroCliente");
@@ -81,24 +107,34 @@ public class ClienteController {
 
     @PostMapping("/cadastro/etapa2")
     public String salvarEtapa2(
-            @ModelAttribute("dto") @Valid ClienteCadastroDTO dto,
+            @ModelAttribute("dto") ClienteCadastroDTO dto, // SEM @Valid aqui também
             BindingResult result,
             @RequestParam(value = "fotoClienteArquivo", required = false) MultipartFile fotoCliente,
             HttpSession session,
             RedirectAttributes attr) {
 
-        if (result.hasFieldErrors("nome") || result.hasFieldErrors("cpf")) {
+        // --- VALIDAÇÃO MANUAL BÁSICA ---
+        if (dto.getNome() == null || dto.getNome().trim().isEmpty()) {
+            result.rejectValue("nome", "erro", "O nome é obrigatório.");
+        }
+        if (dto.getCpf() == null || dto.getCpf().trim().isEmpty()) {
+            result.rejectValue("cpf", "erro", "O CPF é obrigatório.");
+        }
+
+        if (result.hasErrors()) {
             return "clientes/cadastro-etapa2";
         }
 
+        // Recupera dados da Etapa 1
         ClienteCadastroDTO etapa1 = (ClienteCadastroDTO) session.getAttribute("cadastroCliente");
         if (etapa1 == null) return "redirect:/clientes/cadastro/etapa1";
 
+        // Mantém os dados da etapa 1
         dto.setEmail(etapa1.getEmail());
         dto.setSenha(etapa1.getSenha());
         dto.setConfirmarSenha(etapa1.getConfirmarSenha());
 
-        // salva arquivo imediatamente e guarda apenas o nome na sessão
+        // Processa Foto
         if (fotoCliente != null && !fotoCliente.isEmpty()) {
             String nomeArquivo = clienteService.salvarArquivoTemporario(fotoCliente);
             session.setAttribute("fotoClienteNomeTemp", nomeArquivo);
@@ -108,13 +144,13 @@ public class ClienteController {
         return "redirect:/clientes/cadastro/etapa3";
     }
 
-    // ETAPA 3 - seleção de oficina
+    // ETAPA 3
     @GetMapping("/cadastro/etapa3")
     public String etapa3(HttpSession session, Model model) {
         ClienteCadastroDTO dto = (ClienteCadastroDTO) session.getAttribute("cadastroCliente");
         if (dto == null) return "redirect:/clientes/cadastro/etapa1";
         model.addAttribute("dto", dto);
-        model.addAttribute("oficinas", oficinaService.buscarTodas()); // supondo método buscarTodas()
+        model.addAttribute("oficinas", oficinaService.buscarTodas());
         return "clientes/cadastro-etapa3";
     }
 
@@ -123,6 +159,7 @@ public class ClienteController {
                                HttpSession session) {
 
         if (dto.getOficinaId() == null) {
+            // Se quiser validar aqui também pode, mas geralmente o select obriga
             return "clientes/cadastro-etapa3";
         }
 
@@ -133,7 +170,7 @@ public class ClienteController {
         return "forward:/clientes/salvar-final";
     }
 
-    // SALVAR FINAL - recupera nome da foto da sessão e finaliza cadastro
+    // SALVAR FINAL
     @PostMapping("/salvar-final")
     public String salvarFinal(HttpSession session, RedirectAttributes attr) {
         ClienteCadastroDTO dto = (ClienteCadastroDTO) session.getAttribute("cadastroCliente");
@@ -167,14 +204,11 @@ public class ClienteController {
 
         model.addAttribute("cliente", cliente);
         model.addAttribute("oficina", oficina);
-        
-        // --- CORREÇÃO AQUI: BUSCA APENAS SERVIÇOS DO CLIENTE LOGADO ---
-        // Antes estava buscando servicoService.buscarPorOficinaEStatus(oficina.getId(), ...) o que trazia TUDO da oficina
+
         model.addAttribute("servicosAgendados",
                 servicoService.buscarPorClienteEStatus(cliente, "PENDENTE"));
         model.addAttribute("servicosFinalizados",
                 servicoService.buscarPorClienteEStatus(cliente, "FINALIZADO"));
-        // -------------------------------------------------------------
 
         return "clientes/tela-cliente";
     }
@@ -188,7 +222,7 @@ public class ClienteController {
         model.addAttribute("cliente", cliente);
         return "clientes/perfil";
     }
-    
+
     // ALTERAR FOTO DE PERFIL
     @PostMapping("/alterar-foto/{id}")
     public String alterarFotoCliente(
@@ -200,26 +234,20 @@ public class ClienteController {
                     .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
 
             if (!arquivo.isEmpty()) {
-
-                // Cria pasta se não existir
                 String uploadDir = "uploads/";
                 File directory = new File(uploadDir);
                 if (!directory.exists()) {
                     directory.mkdirs();
                 }
 
-                // Nome único
                 String nomeArquivo = UUID.randomUUID() + "_" + arquivo.getOriginalFilename();
                 Path destino = Paths.get(uploadDir + nomeArquivo);
 
-                // Salva arquivo
                 Files.copy(arquivo.getInputStream(), destino, StandardCopyOption.REPLACE_EXISTING);
 
-                // Atualiza cliente
                 cliente.setFoto(nomeArquivo);
                 clienteRepository.save(cliente);
             }
-
             return "redirect:/clientes/perfil/" + id;
 
         } catch (Exception e) {
@@ -227,8 +255,6 @@ public class ClienteController {
             return "redirect:/erro";
         }
     }
-
-
 
     // EXCLUIR
     @PostMapping("/excluir/{id}")

@@ -6,6 +6,8 @@ import edu.ifpb.oficina360.model.MecanicoCadastroDTO;
 import edu.ifpb.oficina360.model.Servico;
 import edu.ifpb.oficina360.service.MecanicoService;
 import edu.ifpb.oficina360.service.ServicoService;
+import edu.ifpb.oficina360.repository.ClienteRepository; // Novo Import
+import edu.ifpb.oficina360.repository.MecanicoRepository; // Novo Import
 import edu.ifpb.oficina360.repository.OficinaRepository;
 import edu.ifpb.oficina360.repository.ServicoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +36,13 @@ public class MecanicoController {
     @Autowired
     private ServicoRepository servicoRepository;
 
+    @Autowired
+    private ClienteRepository clienteRepository; 
+
+    @Autowired
+    private MecanicoRepository mecanicoRepository; 
+
+    // Redireciona mecanico para sua página home.
     @GetMapping("/home/{id}")
     public String home(@PathVariable Long id, Model model) {
         Mecanico mecanico = mecanicoService.buscarPorId(id);
@@ -46,6 +55,7 @@ public class MecanicoController {
         return "mecanicos/mecanico-home";
     }
 
+    // Redireciona mecanico para a página de finalizar servico.
     @GetMapping("/finalizar/{id}")
     public String paginaFinalizarServico(@PathVariable Long id, Model model) {
         Servico servico = servicoRepository.findById(id).orElse(null);
@@ -55,8 +65,7 @@ public class MecanicoController {
         return "servicos/finalizar-servico";
     }
 
-    // ===================== CORREÇÃO AQUI =====================
-    // Captura TODOS os campos do formulário HTML e chama o método correto do Service
+    // Finaliza o servico e o manda para email.
     @PostMapping("/concluir/{id}")
     public String concluirServico(
             @PathVariable Long id,
@@ -69,10 +78,10 @@ public class MecanicoController {
             @RequestParam(value = "pecasTrocadas", required = false) String pecas,
             @RequestParam(value = "valorPecas", defaultValue = "0") Double valorPecas,
             @RequestParam("valorMaoDeObra") Double valorMaoDeObra,
+            @RequestParam("oficinaId") Long oficinaId, 
             RedirectAttributes attr) {
 
         try {
-            // Chama o método "finalizarServicoComDados" que processa tudo e envia o PDF correto
             servicoService.finalizarServicoComDados(
                 id, 
                 veiculoModelo, 
@@ -99,17 +108,35 @@ public class MecanicoController {
         if (s != null) {
             return "redirect:/mecanicos/home/" + s.getMecanico().getId();
         }
-        return "redirect:/";
+        return "redirect:/"; 
     }
 
-    // ... (Outros métodos: adicionar, remover, editar permanecem iguais) ...
+    // Adicionar mecanico a oficina.
     @PostMapping("/adicionar/{oficinaId}")
-    public String adicionarMecanico(@PathVariable Long oficinaId, @ModelAttribute("mecanicoDto") @Valid MecanicoCadastroDTO dto, BindingResult result, @RequestParam("fotoPerfil") MultipartFile fotoPerfil, RedirectAttributes attr) {
-        dto.setFotoArquivo(fotoPerfil);
-        if (result.hasErrors()) {
-            attr.addFlashAttribute("erro", "Verifique os campos.");
+    public String adicionarMecanico(
+            @PathVariable Long oficinaId, 
+            @ModelAttribute("mecanicoDto") @Valid MecanicoCadastroDTO dto, 
+            BindingResult result, 
+            @RequestParam("fotoPerfil") MultipartFile fotoPerfil, 
+            RedirectAttributes attr) {
+
+        boolean emailExiste = clienteRepository.existsByEmail(dto.getEmail()) ||
+                              oficinaRepository.existsByEmail(dto.getEmail()) ||
+                              mecanicoRepository.existsByEmail(dto.getEmail());
+
+        if (emailExiste) {
+            attr.addFlashAttribute("erro", "Erro: Este e-mail já está em uso por outro usuário.");
             return "redirect:/oficinas/home/" + oficinaId;
         }
+        // ---------------------------------------------------
+
+        dto.setFotoArquivo(fotoPerfil);
+        
+        if (result.hasErrors()) {
+            attr.addFlashAttribute("erro", "Verifique os campos obrigatórios.");
+            return "redirect:/oficinas/home/" + oficinaId;
+        }
+        
         try {
             mecanicoService.salvarMecanico(dto, oficinaId);
             attr.addFlashAttribute("sucesso", "Mecânico adicionado!");
@@ -119,6 +146,7 @@ public class MecanicoController {
         return "redirect:/oficinas/home/" + oficinaId;
     }
     
+    // remover mecanico da oficina.
     @PostMapping("/remover/{mecanicoId}/{oficinaId}")
     public String removerMecanico(@PathVariable Long mecanicoId, @PathVariable Long oficinaId, RedirectAttributes attr) {
         try {
@@ -130,6 +158,7 @@ public class MecanicoController {
         return "redirect:/oficinas/home/" + oficinaId;
     }
     
+    // editar informações de mecanico.
     @PostMapping("/editar/{id}")
     public String editarMecanico(@PathVariable Long id, @ModelAttribute MecanicoCadastroDTO dto, @RequestParam("fotoPerfil") MultipartFile fotoPerfil, RedirectAttributes attr) {
         dto.setFotoArquivo(fotoPerfil);
@@ -138,7 +167,7 @@ public class MecanicoController {
         return "redirect:/oficinas/home/" + dto.getOficinaId();
     }
     
-
+    // Confirma edição feita em mecanicos.
     @PostMapping("/{id}/status")
     public String alternarStatus(
             @PathVariable Long id,
@@ -149,5 +178,4 @@ public class MecanicoController {
         attr.addFlashAttribute("sucesso", "Status do mecânico atualizado!");
         return "redirect:/oficinas/home/" + oficinaId;
     }
-
 }

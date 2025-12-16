@@ -10,24 +10,38 @@
 
 <div class="container-flex">
     <div class="left">
-        <img class="logo" src="/images/Logo-da-oficina.png" alt="Logo Oficina 360">
+        <img class="logo" th:src="@{/images/Logo-da-oficina.png}" alt="Logo Oficina 360">
         <div class="form-box">
             <h3>Crie sua conta</h3>
 
             <form th:action="@{/oficinas/cadastro/etapa1}"
                   th:object="${dto}" method="post">
 
-                <input type="email" placeholder="Digite seu email" th:field="*{email}">
+                <input type="email" 
+                       placeholder="Digite seu email" 
+                       th:field="*{email}" 
+                       required>
+                
                 <div th:if="${#fields.hasErrors('email')}" class="text-danger">
                     <p th:errors="*{email}"></p>
                 </div>
 
-                <input type="password" placeholder="Digite sua senha" th:field="*{senha}">
+                <input type="password" 
+                       placeholder="Digite sua senha" 
+                       th:field="*{senha}"
+                       required
+                       pattern="^(?=.*[A-Z])(?=.*\d).{8,}$"
+                       title="A senha deve conter no mínimo 8 caracteres, pelo menos uma letra maiúscula e um número.">
+
                 <div th:if="${#fields.hasErrors('senha')}" class="text-danger">
                     <p th:errors="*{senha}"></p>
                 </div>
 
-                <input type="password" placeholder="Confirmar senha" th:field="*{confirmarSenha}">
+                <input type="password" 
+                       placeholder="Confirmar senha" 
+                       th:field="*{confirmarSenha}" 
+                       required>
+                
                 <div th:if="${#fields.hasErrors('confirmarSenha')}" class="text-danger">
                     <p th:errors="*{confirmarSenha}"></p>
                 </div>
@@ -38,7 +52,7 @@
     </div>
 
     <div class="right">
-        <img class="illustration" src="/images/Desenho da tela de login.png" alt="">
+        <img class="illustration" th:src="@{/images/Desenho da tela de login.png}" alt="">
     </div>
 </div>
 

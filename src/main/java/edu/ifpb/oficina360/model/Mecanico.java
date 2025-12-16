@@ -34,7 +34,6 @@ public class Mecanico {
 	@Column
 	private String numeroTelefone;
     
-    // NOVO CAMPO PARA ARMAZENAR O NOME DO ARQUIVO DA FOTO NO DISCO
     @Column(name = "foto_arquivo")
     private String nomeArquivoFoto;
 	
@@ -108,7 +107,6 @@ public class Mecanico {
 	public void setNomeArquivoFoto(String nomeArquivoFoto) {
 		this.nomeArquivoFoto = nomeArquivoFoto;
 	}
-    // FIM NOVO GETTER E SETTER
 
 	public LocalTime getHoraInicio() {
 		return horaInicio;

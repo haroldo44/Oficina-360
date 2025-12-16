@@ -18,12 +18,11 @@ public class Servico {
     @Column
     private String titulo;
 
-    // CORREÇÃO AQUI: Mudado de "TEXT" para "CLOB" para funcionar no Oracle
     @Column(name = "descricao", columnDefinition = "CLOB") 
     private String descricao;
 
     @Column
-    private String status; // PENDENTE, FINALIZADO
+    private String status;
 
     @Column(name = "data_agendamento")
     private LocalDate dataAgendamento;

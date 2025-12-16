@@ -17,7 +17,7 @@ import edu.ifpb.oficina360.service.*;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
-@RequestMapping("/clientes") // Mantemos o mesmo prefixo para não quebrar os links
+@RequestMapping("/clientes")
 public class ClienteServicoController {
 
     @Autowired private ClienteService clienteService;
@@ -25,24 +25,19 @@ public class ClienteServicoController {
     @Autowired private MecanicoService mecanicoService;
     @Autowired private ServicoRepository servicoRepository;
 
-    // =========================================================================
-    // FLUXO DE SOLICITAÇÃO DE SERVIÇO (WIZARD 3 ETAPAS)
-    // =========================================================================
 
-    // --- ETAPA 1: ESCOLHER PROBLEMA ---
+    // ETAPA 1: ESCOLHER PROBLEMA 
     @GetMapping("/solicitar-servico/{idCliente}")
     public String etapa1Solicitacao(@PathVariable Long idCliente, HttpSession session, Model model) {
         Cliente cliente = clienteService.buscarPorId(idCliente);
         if (cliente == null) return "redirect:/";
 
-        // Inicializa o DTO na sessão
         ServicoAgendamentoDTO dto = new ServicoAgendamentoDTO();
         dto.setIdCliente(idCliente);
         session.setAttribute("agendamentoTemp", dto);
         
         model.addAttribute("cliente", cliente);
         
-        // Caminho correto da pasta: servicos (plural)
         return "servicos/servico-etapa1";
     }
 
@@ -67,7 +62,7 @@ public class ClienteServicoController {
         return "redirect:/clientes/solicitar-servico/etapa2";
     }
 
-    // --- ETAPA 2: ESCOLHER MECÂNICO ---
+    // ETAPA 2: ESCOLHER MECÂNICO 
     @GetMapping("/solicitar-servico/etapa2")
     public String etapa2Solicitacao(HttpSession session, Model model) {
         ServicoAgendamentoDTO dto = (ServicoAgendamentoDTO) session.getAttribute("agendamentoTemp");
@@ -75,7 +70,6 @@ public class ClienteServicoController {
 
         Cliente cliente = clienteService.buscarPorId(dto.getIdCliente());
         
-        // Busca apenas mecânicos da oficina onde o cliente está cadastrado
         List<Mecanico> mecanicos = mecanicoService.buscarMecanicosPorOficina(cliente.getOficina().getId());
         
         model.addAttribute("mecanicos", mecanicos);
@@ -95,7 +89,7 @@ public class ClienteServicoController {
         return "redirect:/clientes/solicitar-servico/etapa3";
     }
 
-    // --- ETAPA 3: DATA E HORÁRIO ---
+    // ETAPA 3: DATA E HORÁRIO
     @GetMapping("/solicitar-servico/etapa3")
     public String etapa3Solicitacao(HttpSession session, Model model) {
         ServicoAgendamentoDTO dto = (ServicoAgendamentoDTO) session.getAttribute("agendamentoTemp");
@@ -156,10 +150,8 @@ public class ClienteServicoController {
 
             servicoService.salvar(servico);
 
-            // Limpa sessão
             session.removeAttribute("agendamentoTemp");
             
-            // --- CORREÇÃO: FORMATAÇÃO DA DATA (BR) ---
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
             String dataFormatada = data.format(formatter);
             
@@ -173,14 +165,13 @@ public class ClienteServicoController {
         }
     }
     
-    // ROTA PARA CANCELAR SERVIÇO (Soft Delete)
+    // ROTA PARA CANCELAR SERVIÇO
     @PostMapping("/servicos/cancelar/{idServico}")
     public String cancelarServico(@PathVariable Long idServico, RedirectAttributes attr) {
         try {
             Servico servico = servicoRepository.findById(idServico)
                     .orElseThrow(() -> new RuntimeException("Serviço não encontrado"));
 
-            // Muda status para CANCELADO (Soft Delete)
             servico.setStatus("CANCELADO"); 
             servicoRepository.save(servico); 
 
@@ -190,7 +181,7 @@ public class ClienteServicoController {
         } catch (Exception e) {
             e.printStackTrace();
             attr.addFlashAttribute("erro", "Erro ao cancelar serviço.");
-            return "redirect:/clientes/home/" + 1; // Fallback
+            return "redirect:/clientes/home/" + 1;
         }
     }
 }

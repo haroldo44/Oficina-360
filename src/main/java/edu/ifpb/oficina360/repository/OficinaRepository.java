@@ -10,4 +10,5 @@ import edu.ifpb.oficina360.model.Oficina;
 @Repository
 public interface OficinaRepository extends JpaRepository<Oficina, Long> {
 	Optional<Oficina> findByEmail(String email);
+	boolean existsByEmail(String email);
 }

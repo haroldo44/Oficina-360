@@ -27,15 +27,26 @@
             </div>
 
             <label>Nome da oficina</label>
-            <input type="text" th:field="*{nomeDaOficina}" placeholder="Digite o nome da oficina">
+            <input type="text" th:field="*{nomeDaOficina}" placeholder="Digite o nome da oficina" required>
+            
             <label>CNPJ</label>
-            <input type="text" th:field="*{cnpj}" placeholder="Digite seu CNPJ">
+            <input type="text" 
+                   th:field="*{cnpj}" 
+                   placeholder="XX.XXX.XXX/XXXX-XX" 
+                   required
+                   maxlength="18"
+                   pattern="\d{2}\.\d{3}\.\d{3}/\d{4}-\d{2}"
+                   title="Digite o CNPJ no formato XX.XXX.XXX/XXXX-XX"
+                   oninput="mascaraCNPJ(this)">
+
             <label>Cidade</label>
-            <input type="text" th:field="*{cidade}" placeholder="Digite o nome da cidade">
+            <input type="text" th:field="*{cidade}" placeholder="Digite o nome da cidade" required>
+            
             <label>Bairro</label>
-            <input type="text" th:field="*{bairro}" placeholder="Digite o nome do bairro">
+            <input type="text" th:field="*{bairro}" placeholder="Digite o nome do bairro" required>
+            
             <label>Rua</label>
-            <input type="text" th:field="*{rua}" placeholder="Digite o nome da rua">
+            <input type="text" th:field="*{rua}" placeholder="Digite o nome da rua" required>
         </div>
 
         <div class="col-dir">
@@ -49,15 +60,26 @@
             </div>
 
             <label>Nome</label>
-            <input type="text" th:field="*{nomeDoProprietario}" placeholder="Digite o seu nome">
+            <input type="text" th:field="*{nomeDoProprietario}" placeholder="Digite o seu nome" required>
+            
             <label>Número de telefone</label>
-            <input type="text" th:field="*{telefoneDoProprietario}" placeholder="Digite o número">
+            <input type="text" 
+                   th:field="*{telefoneDoProprietario}" 
+                   placeholder="(XX) XXXXX-XXXX" 
+                   required
+                   maxlength="15"
+                   pattern="\(\d{2}\) \d{5}-\d{4}"
+                   title="Digite o telefone no formato (xx) xxxxx-xxxx"
+                   oninput="mascaraTelefone(this)">
+            
             <label>Cidade onde mora</label>
-            <input type="text" th:field="*{cidadeDoProprietario}" placeholder="Cidade">
+            <input type="text" th:field="*{cidadeDoProprietario}" placeholder="Cidade" required>
+            
             <label>Bairro</label>
-            <input type="text" th:field="*{bairroDoProprietario}" placeholder="Bairro">
+            <input type="text" th:field="*{bairroDoProprietario}" placeholder="Bairro" required>
+            
             <label>Rua</label>
-            <input type="text" th:field="*{ruaDoProprietario}" placeholder="Rua">
+            <input type="text" th:field="*{ruaDoProprietario}" placeholder="Rua" required>
 
             <button type="submit" class="btn-finalizar">Finalizar</button>
         </div>
@@ -65,13 +87,46 @@
 </div>
 
 <script>
-function previewImage(event, previewId) {
-    const reader = new FileReader();
-    reader.onload = function() {
-        document.getElementById(previewId).src = reader.result;
-    };
-    reader.readAsDataURL(event.target.files[0]);
-}
+    // Preview das Imagens
+    function previewImage(event, previewId) {
+        const file = event.target.files[0];
+        if(file) {
+            const reader = new FileReader();
+            reader.onload = function() {
+                document.getElementById(previewId).src = reader.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    // Máscara para Telefone: (00) 00000-0000
+    function mascaraTelefone(input) {
+        let v = input.value;
+        v = v.replace(/\D/g,""); // Remove tudo o que não é dígito
+        v = v.replace(/^(\d{2})(\d)/g,"($1) $2"); // Coloca parênteses em volta dos dois primeiros dígitos
+        v = v.replace(/(\d)(\d{4})$/,"$1-$2"); // Coloca hífen entre o quinto e o sexto dígitos
+        input.value = v;
+    }
+
+    // Máscara para CNPJ: 00.000.000/0000-00
+    function mascaraCNPJ(input) {
+        let v = input.value;
+        v = v.replace(/\D/g,""); // Remove tudo o que não é dígito
+        
+        // Coloca ponto entre o segundo e o terceiro dígitos
+        v = v.replace(/^(\d{2})(\d)/,"$1.$2");
+        
+        // Coloca ponto entre o quinto e o sexto dígitos
+        v = v.replace(/^(\d{2})\.(\d{3})(\d)/,"$1.$2.$3");
+        
+        // Coloca uma barra entre o oitavo e o nono dígitos
+        v = v.replace(/\.(\d{3})(\d)/,".$1/$2");
+        
+        // Coloca um hífen depois do bloco de quatro dígitos
+        v = v.replace(/(\d{4})(\d)/,"$1-$2");
+        
+        input.value = v;
+    }
 </script>
 
 </body>

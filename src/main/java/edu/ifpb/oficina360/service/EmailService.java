@@ -31,8 +31,8 @@ public class EmailService {
     private String remetente;
 
     // Cores
-    private static final Color BG_HEADER = new Color(75, 85, 99); // Cinza Escuro
-    private static final Color BG_TOTAL = new Color(245, 245, 245); // Cinza Claro
+    private static final Color BG_HEADER = new Color(75, 85, 99); 
+    private static final Color BG_TOTAL = new Color(245, 245, 245); 
     private static final Color BORDER_COLOR = new Color(200, 200, 200);
     
     private static final Locale PT_BR = new Locale("pt", "BR");

@@ -31,12 +31,27 @@
                     <p th:errors="*{nome}"></p>
                 </div>
 
-                <input type="text" th:field="*{cpf}" placeholder="Digite seu CPF" required>
+                <input type="text" 
+                       th:field="*{cpf}" 
+                       placeholder="Digite seu CPF" 
+                       required
+                       maxlength="14"
+                       pattern="\d{3}\.\d{3}\.\d{3}-\d{2}"
+                       title="Digite o CPF no formato xxx.xxx.xxx-xx"
+                       oninput="mascaraCPF(this)">
+                
                 <div th:if="${#fields.hasErrors('cpf')}" class="text-danger">
                     <p th:errors="*{cpf}"></p>
                 </div>
 
-                <input type="text" th:field="*{contato}" placeholder="Digite seu número de telefone">
+                <input type="text" 
+                       th:field="*{contato}" 
+                       placeholder="Digite seu telefone (xx) xxxxx-xxxx"
+                       maxlength="15"
+                       pattern="\(\d{2}\) \d{5}-\d{4}"
+                       title="Digite o telefone no formato (xx) xxxxx-xxxx"
+                       oninput="mascaraTelefone(this)">
+
                 <input type="text" th:field="*{cidade}" placeholder="Digite sua cidade">
                 <input type="text" th:field="*{bairro}" placeholder="Digite seu bairro">
                 <input type="text" th:field="*{rua}" placeholder="Digite sua rua">
@@ -51,19 +66,49 @@
 </div>
 
 <script>
+    // Script de Preview da Imagem
     document.getElementById('fotoClienteArquivo').addEventListener('change', function(event) {
         const file = event.target.files[0];
         if (file) {
             const reader = new FileReader();
-            
             reader.onload = function(e) {
                 const img = document.getElementById('previewImagem');
-                img.src = e.target.result; // Atualiza a fonte da imagem para o arquivo selecionado
+                img.src = e.target.result; 
             }
-            
-            reader.readAsDataURL(file); // Lê o arquivo como uma URL de dados
+            reader.readAsDataURL(file); 
         }
     });
+
+    // --- MÁSCARA PARA CPF ---
+    function mascaraCPF(input) {
+        let value = input.value;
+        
+        // Remove tudo que não é número
+        value = value.replace(/\D/g, "");
+        
+        // Adiciona os pontos e traço
+        value = value.replace(/(\d{3})(\d)/, "$1.$2");
+        value = value.replace(/(\d{3})(\d)/, "$1.$2");
+        value = value.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+        
+        input.value = value;
+    }
+
+    // --- MÁSCARA PARA TELEFONE ---
+    function mascaraTelefone(input) {
+        let value = input.value;
+        
+        // Remove tudo que não é número
+        value = value.replace(/\D/g, "");
+        
+        // Coloca parênteses em volta dos dois primeiros dígitos
+        value = value.replace(/^(\d{2})(\d)/g, "($1) $2");
+        
+        // Coloca hífen entre o quinto e o sexto dígitos
+        value = value.replace(/(\d)(\d{4})$/, "$1-$2");
+        
+        input.value = value;
+    }
 </script>
 
 </body>

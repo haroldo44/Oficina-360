@@ -8,6 +8,6 @@ import java.util.Optional;
 public interface MecanicoRepository extends JpaRepository<Mecanico, Long> {
     List<Mecanico> findByOficinaId(Long oficinaId);
     Optional<Mecanico> findByEmail(String email);
-    
     List<Mecanico> findByOficinaIdAndAtivoTrue(Long oficinaId);
+    boolean existsByEmail(String email);
 }

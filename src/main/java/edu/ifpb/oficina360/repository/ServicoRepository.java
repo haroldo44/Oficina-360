@@ -14,13 +14,15 @@ import edu.ifpb.oficina360.model.Servico;
 @Repository
 public interface ServicoRepository extends JpaRepository<Servico, Long> {
     
+    // --- ADICIONE ESSA LINHA AQUI PARA CORRIGIR O ERRO ---
+    List<Servico> findByOficinaId(Long oficinaId);
+    // -----------------------------------------------------
+
     List<Servico> findByOficinaIdAndStatus(Long oficinaId, String status);
     List<Servico> findByClienteAndStatus(Cliente cliente, String status);
     List<Servico> findByMecanicoAndStatus(Mecanico mecanico, String status);
     
-    // Método para validar disponibilidade do mecânico
     boolean existsByMecanicoAndDataAgendamentoAndHoraAgendamentoAndStatusNot(
             Mecanico mecanico, LocalDate data, LocalTime hora, String statusIgnorado);
-    
     
 }

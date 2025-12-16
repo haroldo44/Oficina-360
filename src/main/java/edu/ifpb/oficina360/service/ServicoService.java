@@ -105,7 +105,7 @@ public class ServicoService {
             servico.setDescricao("Sem descrição informada.");
         }
 
-        // 🔥 GERA E SALVA PDF
+        // GERA E SALVA PDF
         String caminhoPdf = pdfComprovanteService.gerarESalvarPdf(
                 servico,
                 modelo,
@@ -123,7 +123,7 @@ public class ServicoService {
         servico.setCaminhoPdf(caminhoPdf);
         servicoRepository.save(servico);
 
-        // 📧 ENVIA EMAIL (IGUAL AO QUE JÁ FUNCIONAVA)
+        // ENVIA EMAIL
         if (servico.getCliente() != null && servico.getCliente().getEmail() != null) {
             emailService.enviarComprovantePdf(
                     servico,
@@ -143,7 +143,6 @@ public class ServicoService {
 
 
     // Método legado (CORRIGIDO PARA COMPILAR)
-    // Removemos as chamadas para getDiagnosticoMecanico() que não existem na entidade atual.
     public void enviarComprovantePorId(Long idServico) {
         Servico servico = servicoRepository.findById(idServico)
                 .orElseThrow(() -> new RuntimeException("Serviço não encontrado"));
@@ -151,7 +150,6 @@ public class ServicoService {
         if (servico.getDescricao() == null) servico.setDescricao("Sem descrição informada.");
 
         if (servico.getCliente() != null && servico.getCliente().getEmail() != null) {
-            // Passa valores padrão/vazios para os campos novos, já que não temos de onde tirar do banco
             emailService.enviarComprovantePdf(
                 servico, 
                 "Ver Sistema", // Modelo

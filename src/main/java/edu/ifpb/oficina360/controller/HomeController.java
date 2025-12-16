@@ -10,13 +10,13 @@ public class HomeController {
 
     @GetMapping("/")
     public String home() {
-        return "home";  // carrega templates/home.html
+        return "home";
     }
     
     @GetMapping("/logout")
     public String logout(HttpSession session) {
-        session.invalidate(); // limpa a sessão
-        return "redirect:/?logout=true"; // volta para a tela de login (home.html)
+        session.invalidate();
+        return "redirect:/?logout=true";
     }
 
 }

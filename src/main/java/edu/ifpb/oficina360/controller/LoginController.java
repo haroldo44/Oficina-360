@@ -1,10 +1,10 @@
 package edu.ifpb.oficina360.controller;
 
 import edu.ifpb.oficina360.model.Cliente;
-import edu.ifpb.oficina360.model.Mecanico; // Importante
+import edu.ifpb.oficina360.model.Mecanico;
 import edu.ifpb.oficina360.model.Oficina;
 import edu.ifpb.oficina360.service.ClienteService;
-import edu.ifpb.oficina360.service.MecanicoService; // Importante
+import edu.ifpb.oficina360.service.MecanicoService;
 import edu.ifpb.oficina360.service.OficinaService;
 
 import jakarta.servlet.http.HttpSession;
@@ -24,7 +24,16 @@ public class LoginController {
     private ClienteService clienteService;
 
     @Autowired
-    private MecanicoService mecanicoService; // INJEÇÃO DO SERVIÇO
+    private MecanicoService mecanicoService; 
+
+    // --- CORREÇÃO AQUI ---
+    // A URL no navegador será "/login"
+    @GetMapping("/login")
+    public String abrirTelaLogin() {
+        // O Spring vai procurar o arquivo templates/home.html
+        return "home"; 
+    }
+    // ---------------------
 
     @PostMapping("/login")
     public String login(@RequestParam String email,
@@ -32,7 +41,7 @@ public class LoginController {
                         HttpSession session,
                         RedirectAttributes attr) {
 
-        // 1️⃣ TENTA LOGIN COMO OFICINA
+        // 1. TENTA LOGIN COMO OFICINA
         Oficina oficina = oficinaService.buscarPorEmail(email);
         if (oficina != null && oficina.getSenha().equals(senha)) {
             session.setAttribute("usuarioLogado", oficina);
@@ -40,7 +49,7 @@ public class LoginController {
             return "redirect:/oficinas/home/" + oficina.getId();
         }
 
-        // 2️⃣ TENTA LOGIN COMO CLIENTE
+        // 2. TENTA LOGIN COMO CLIENTE
         Cliente cliente = clienteService.buscarPorEmail(email);
         if (cliente != null && cliente.getSenha().equals(senha)) {
             session.setAttribute("usuarioLogado", cliente);
@@ -48,17 +57,16 @@ public class LoginController {
             return "redirect:/clientes/home/" + cliente.getId();
         }
 
-        // 3️⃣ TENTA LOGIN COMO MECÂNICO (NOVO)
+        // 3. TENTA LOGIN COMO MECÂNICO
         Mecanico mecanico = mecanicoService.buscarPorEmail(email);
         if (mecanico != null && mecanico.getSenha().equals(senha)) {
             session.setAttribute("usuarioLogado", mecanico);
             session.setAttribute("tipoUsuario", "MECANICO");
-            // Redireciona para a rota que carrega o home do mecânico
             return "redirect:/mecanicos/home/" + mecanico.getId();
         }
 
-        // 4️⃣ NENHUM USUÁRIO ENCONTRADO
-        attr.addFlashAttribute("erro", "Email ou senha inválidos!");
+        // 4. FALHA NO LOGIN
+        attr.addFlashAttribute("erro", "Email/senha inválidos ou essa conta não existe!");
         return "redirect:/login";
     }
 }

@@ -6,7 +6,6 @@ import jakarta.validation.constraints.*; // Use a importação correta (jakarta 
 
 public class MecanicoCadastroDTO {
     
-    // Usado para receber o arquivo da foto
     private MultipartFile fotoArquivo;
 
     @NotBlank(message = "O nome é obrigatório")
@@ -23,7 +22,6 @@ public class MecanicoCadastroDTO {
     @NotBlank(message = "O telefone é obrigatório")
     private String numeroTelefone;
 
-    // O nome do arquivo será salvo no DB (para exibição)
     private String nomeArquivoFoto;
     
     @NotBlank(message = "O início da manhã é obrigatório")

@@ -37,10 +37,7 @@ public class ClienteService {
                 .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
     }
 
-    /**
-     * Salva o arquivo no disco e retorna o nome gerado.
-     * Usado na Etapa 2 para não guardar MultipartFile na sessão.
-     */
+
     public String salvarArquivoTemporario(MultipartFile arquivo) {
         if (arquivo == null || arquivo.isEmpty()) return null;
         String nomeArquivo = UUID.randomUUID() + "_" + StringUtils.cleanPath(arquivo.getOriginalFilename());
@@ -55,14 +52,12 @@ public class ClienteService {
         }
     }
 
-    /**
-     * Finaliza cadastro usando o nome do arquivo já salvo (fotoNome).
-     */
+
     public Cliente finalizarCadastro(ClienteCadastroDTO dto, String fotoNome) {
         Cliente cliente = new Cliente();
 
         cliente.setEmail(dto.getEmail());
-        cliente.setSenha(dto.getSenha()); // mantém comparação direta conforme seu padrão
+        cliente.setSenha(dto.getSenha()); 
         cliente.setNome(dto.getNome());
         cliente.setCpf(dto.getCpf());
         cliente.setContato(dto.getContato());
@@ -80,7 +75,7 @@ public class ClienteService {
         return clienteRepository.save(cliente);
     }
 
-    // Atualiza foto do cliente (substitui arquivo e atualiza nome no banco)
+    // Atualiza foto do cliente.
     public void atualizarFotoCliente(Long id, MultipartFile novaFoto) {
         Cliente cliente = clienteRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));

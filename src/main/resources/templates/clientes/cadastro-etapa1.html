@@ -13,22 +13,24 @@
         <div class="form-box">
             <h3>Crie sua conta</h3>
 
-            <!-- O DTO precisa estar no model como "dto" -->
             <form th:action="@{/clientes/cadastro/etapa1}" th:object="${dto}" method="post">
 
-                <!-- Email -->
                 <input type="email" th:field="*{email}" placeholder="Digite seu email" required>
                 <div th:if="${#fields.hasErrors('email')}" class="text-danger">
                     <p th:errors="*{email}"></p>
                 </div>
 
-                <!-- Senha -->
-                <input type="password" th:field="*{senha}" placeholder="Digite sua senha" required>
+                <input type="password" 
+                       th:field="*{senha}" 
+                       placeholder="Digite sua senha" 
+                       required
+                       pattern="^(?=.*[A-Z])(?=.*\d).{8,}$"
+                       title="A senha deve conter no mínimo 8 caracteres, pelo menos uma letra maiúscula e um número.">
+                
                 <div th:if="${#fields.hasErrors('senha')}" class="text-danger">
                     <p th:errors="*{senha}"></p>
                 </div>
 
-                <!-- Confirmar Senha -->
                 <input type="password" th:field="*{confirmarSenha}" placeholder="Confirmar senha" required>
                 <div th:if="${#fields.hasErrors('confirmarSenha')}" class="text-danger">
                     <p th:errors="*{confirmarSenha}"></p>

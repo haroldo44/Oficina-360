@@ -63,7 +63,8 @@
                 <input type="text" name="nomeDaOficina" th:value="${oficina.nomeDaOficina}" class="campo-editavel" readonly>
 
                 <label>CNPJ</label>
-                <input type="text" name="cnpj" th:value="${oficina.cnpj}" class="campo-editavel" readonly>
+                <input type="text" name="cnpj" th:value="${oficina.cnpj}" class="campo-editavel" readonly
+                       maxlength="18" oninput="mascaraCNPJ(this)">
 
                 <label>Cidade</label>
                 <input type="text" name="cidade" th:value="${oficina.cidade}" class="campo-editavel" readonly>
@@ -77,7 +78,8 @@
 
             <div class="info-col-dir">
                 <label>Número de telefone</label>
-                <input type="text" name="telefoneDoProprietario" th:value="${oficina.telefoneDoProprietario}" class="campo-editavel" readonly>
+                <input type="text" name="telefoneDoProprietario" th:value="${oficina.telefoneDoProprietario}" class="campo-editavel" readonly
+                       maxlength="15" oninput="mascaraTelefone(this)">
 
                 <label>Descrição</label>
                 <textarea rows="11" name="descricao" class="campo-editavel" readonly
@@ -193,7 +195,8 @@
             <input type="password" id="senha" th:field="*{senha}" required minlength="3" maxlength="20">
 
             <label for="telefone">N° Telefone</label>
-            <input type="tel" id="telefone" th:field="*{numeroTelefone}" required placeholder="(99) 99999-9999">
+            <input type="tel" id="telefone" th:field="*{numeroTelefone}" required 
+                   placeholder="(99) 99999-9999" maxlength="15" oninput="mascaraTelefone(this)">
             
             <label>Horário de Trabalho</label>
             <div style="display:flex; justify-content:space-between; gap: 15px;">
@@ -259,7 +262,7 @@
 
             <label for="editTelefone">N° Telefone</label>
             <input type="tel" id="editTelefone" name="numeroTelefone" required
-                   pattern="\(\d{2}\)\s\d{4,5}-\d{4}" placeholder="(99) 99999-9999">
+                   placeholder="(99) 99999-9999" maxlength="15" oninput="mascaraTelefone(this)">
 
             <label>Horário de Trabalho</label>
             <div style="display:flex; gap: 15px;">
@@ -373,23 +376,15 @@
 
     // --- Nova Função: Abrir Modal de Exclusão ---
     function abrirModalExclusao(event, mecanicoId, oficinaId) {
-        // Impede que o clique propague para o card (não abre o editar)
         if(event) event.stopPropagation();
-
         const modal = document.getElementById('modalConfirmarExclusao');
         const form = document.getElementById('formConfirmarExclusao');
-        
-        // Define a URL correta para deletar esse mecânico específico
         form.action = '/mecanicos/remover/' + mecanicoId + '/' + oficinaId;
-        
-        // Mostra o modal
         modal.style.display = 'block';
     }
 
     // --- Lógica Mecânicos (Modal Editar) ---
     function abrirModalEdicao(card) {
-        // Se estiver clicando no botão remover (que é filho), não faz nada aqui
-        // (Já tratado no onclick do botão remover, mas segurança extra)
         
         const id = card.getAttribute('data-id');
         const nome = card.getAttribute('data-nome');
@@ -425,7 +420,6 @@
         document.getElementById('modalEditarMecanico').style.display = 'block';
     }
 
-    // Previews de Imagens
     function previewImagemAdd(event) {
         const input = event.target;
         if (input.files && input.files[0]) {
@@ -446,6 +440,30 @@
             }
             reader.readAsDataURL(input.files[0]);
         }
+    }
+
+    // --- FUNÇÃO PARA MÁSCARA TELEFONE ---
+    function mascaraTelefone(input) {
+        let v = input.value;
+        v = v.replace(/\D/g, ""); // Remove tudo o que não é dígito
+        v = v.replace(/^(\d{2})(\d)/g, "($1) $2"); // Coloca parênteses em volta dos dois primeiros dígitos
+        v = v.replace(/(\d)(\d{4})$/, "$1-$2"); // Coloca hífen entre o quarto e o quinto dígitos
+        input.value = v;
+    }
+
+    // --- NOVA FUNÇÃO PARA MÁSCARA CNPJ (Adicionada) ---
+    function mascaraCNPJ(input) {
+        let v = input.value;
+        v = v.replace(/\D/g, ""); // Remove tudo o que não é dígito
+
+        if(v.length > 14) v = v.substring(0, 14);
+
+        v = v.replace(/^(\d{2})(\d)/, "$1.$2"); // Coloca ponto entre o segundo e o terceiro dígitos
+        v = v.replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3"); // Coloca ponto entre o quinto e o sexto dígitos
+        v = v.replace(/\.(\d{3})(\d)/, ".$1/$2"); // Coloca uma barra entre o oitavo e o nono dígitos
+        v = v.replace(/(\d{4})(\d)/, "$1-$2"); // Coloca um hífen depois do bloco de quatro dígitos
+
+        input.value = v;
     }
 </script>
 

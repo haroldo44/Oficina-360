@@ -10,6 +10,7 @@ import edu.ifpb.oficina360.model.Cliente;
 @RequestMapping("/tipoDeContas")
 public class TipoDeConta {
 
+	// Redireciona para a página de escolha de perfil de usuário.
 	@GetMapping("/escolhaTipo")
     public String etapa1(Cliente cliente) {
         return "/tipoConta/perfilConta";

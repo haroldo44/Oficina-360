@@ -21,7 +21,7 @@ public class OficinaService {
     private OficinaRepository oficinaRepository;
     
     
-    // Agora a pasta é EXTERNA ao projeto
+    // Pasta uploads onde armazena as imagens adicionas e alteradas do sistema
     private final String uploadDir = "uploads/";
 
     public OficinaService() {

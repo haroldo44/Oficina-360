@@ -106,7 +106,7 @@ public class MecanicoService {
         mecanico.setSenha(dto.getSenha());
         mecanico.setNumeroTelefone(dto.getNumeroTelefone());
         
-        // Conversão de String para LocalTime na edição
+        // Conversão de String para LocalTime.
         mecanico.setTurnoManhaInicio(LocalTime.parse(dto.getTurnoManhaInicioString()));
         mecanico.setTurnoManhaFim(LocalTime.parse(dto.getTurnoManhaFimString()));
         mecanico.setTurnoTardeInicio(LocalTime.parse(dto.getTurnoTardeInicioString()));
@@ -124,7 +124,6 @@ public class MecanicoService {
         mecanicoRepository.save(mecanico);
     }
 
-    // --- MÉTODO ADICIONADO PARA CORRIGIR O ERRO ---
     public Mecanico buscarPorId(Long id) {
         return mecanicoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Mecânico não encontrado com id: " + id));
